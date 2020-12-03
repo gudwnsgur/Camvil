@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.camvil.repository.CampsiteRepository">
+    <resultMap id="campsiteMap" type="com.app.camvil.dto.CampsiteDTO">
+        <result column="campsite_code" property="campsiteCode"/>
+        <result column="campsite_name" property="campsiteName"/>
+        <result column="mapX" property="mapX"/>
+        <result column="mapY" property="mapY"/>
+    </resultMap>
+
+    <select id="findCampsiteNameByCode" resultMap="campsiteMap">
+        SELECT campsite_name FROM campsites WHERE campsite_code = '${campsiteCode}';
+    </select>
+    <insert id="insertCampsite" parameterType="CampsiteDTO">
+                INSERT INTO campsites
+                VALUES ('${campsiteCode}', '${campsiteName}', '${mapX}', '${mapY}');
+    </insert>
+
+</mapper>

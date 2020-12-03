@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.camvil.repository.UserRepository">
+    <resultMap id="userMap" type="com.app.camvil.dto.UserDTO">
+        <result column="user_id" property="userId"/>
+        <result column="user_sid" property="userSid"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_image_path" property="userImagePath"/>
+        <result column="access_token" property="accessToken"/>
+        <result column="join_date" property="joinDate"/>
+        <result column="user_auth" property="userAuth"/>
+    </resultMap>
+
+    <select id="getUserList" resultMap="userMap">
+        SELECT * FROM users;
+    </select>
+
+    <select id="findUserByUserId" resultMap="userMap">
+        SELECT * FROM users WHERE user_id = '${userId}';
+    </select>
+    <select id="findUserByUserSid" resultMap="userMap">
+        SELECT * FROM users WHERE user_sid = '${userSid}';
+    </select>
+    <select id="getSearch" resultType="com.app.camvil.dto.SearchDTO">
+        SELECT search_content as searchContent, search_cnt as searchCnt
+        FROM search LIMIT 10;
+    </select>
+
+
+    <insert id="insertUser" parameterType="UserDTO">
+            INSERT INTO users(user_sid, user_email, user_name, user_image_path, access_token, join_date, user_auth)
+            VALUES ('${userSid}','${userEmail}','${userName}','${userImagePath}','${accessToken}',now(),false)
+    </insert>
+
+    <update id="updateUser" parameterType="UserDTO">
+            UPDATE users SET user_name = '${userName}', user_image_path='${userImagePath}'
+            WHERE user_id = '${userId}';
+    </update>
+    <update id="updateUserToken" parameterType="UserDTO">
+        UPDATE users SET access_token = '${accessToken}' WHERE user_sid = '${userSid}';
+    </update>
+
+    <delete id="deleteUser" parameterType="UserDTO">
+        CALL DeleteUser('${userId}');
+    </delete>
+
+</mapper>

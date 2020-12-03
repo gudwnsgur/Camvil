@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.camvil.repository.ImageRepository">
+    <resultMap id="imageMap" type="com.app.camvil.dto.ImageDTO">
+        <result column="image_id" property="imageId"/>
+        <result column="board_id" property="boardId"/>
+        <result column="image_name" property="imageName"/>
+        <result column="image_path" property="imagePath"/>
+    </resultMap>
+
+    <insert id="insertImages" parameterType="ImageDTO">
+        INSERT INTO images(board_id, image_name, image_path)
+        VALUES ('${boardId}', '${imageName}', '${imagePath}');
+    </insert>
+
+    <select id="findImagesByBoardId" resultMap="imageMap">
+        SELECT * FROM images WHERE board_id = '${boardId}';
+    </select>
+
+    <delete id="deleteImagesByBoardId" parameterType="ImageDTO">
+        DELETE FROM images WHERE board_id = '${boardId}';
+    </delete>
+
+</mapper>
