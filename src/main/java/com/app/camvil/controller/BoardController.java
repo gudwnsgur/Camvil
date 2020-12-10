@@ -46,6 +46,15 @@ public class BoardController {
                 boardsRequestDTO.getOrder().equals("post_date")) ? "post_date" : "like_cnt";
         String campsiteCode = boardsRequestDTO.getCampsiteCode() == null ? "" : boardsRequestDTO.getCampsiteCode();
         String search =  boardsRequestDTO.getSearch() == null ? "" : boardsRequestDTO.getSearch();
+
+        if(!search.equals("")) {
+            if(userService.findSearchBySearchContent(search) == null) {
+                userService.insertSearchContent(search);
+            }
+            userService.increaseSearchContent(search);
+        }
+
+
         long total = boardService.getTotalBoardCnt(search, campsiteCode, order);
 
         List<BoardsDTO> boardsDTOS = boardService.getBoards(search, campsiteCode, order,

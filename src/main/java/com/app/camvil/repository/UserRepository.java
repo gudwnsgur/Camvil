@@ -14,7 +14,9 @@ public interface UserRepository {
     UserDTO findUserByUserId(long userId);
     UserDTO findUserByUserSid(String userSid);
     List<SearchDTO> getSearch();
-
+    SearchDTO findSearchBySearchContent(String searchContent);
+    void insertSearchContent(String searchContent);
+    void increaseSearchContent(String searchContent);
     void insertUser(UserDTO user);
     void updateUser(UserDTO user);
     void updateUserToken(UserDTO user);

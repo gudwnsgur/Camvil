@@ -33,5 +33,7 @@ public class UserService {
     }
 
     public List<SearchDTO> getSearch() {return repository.getSearch();}
-
+    public SearchDTO findSearchBySearchContent(String searchContent){return repository.findSearchBySearchContent(searchContent);}
+    public void insertSearchContent(String searchContent) {repository.insertSearchContent(searchContent);}
+    public void increaseSearchContent(String searchContent) {repository.increaseSearchContent(searchContent);}
 }

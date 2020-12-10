@@ -30,6 +30,16 @@
         FROM search LIMIT 10;
     </select>
 
+    <select id="findSearchBySearchContent" resultType="com.app.camvil.dto.SearchDTO">
+        SELECT search_content as searchContent FROM search WHERE search_content = '${searchContent}'
+    </select>
+    <insert id="insertSearchContent" parameterType="com.app.camvil.dto.SearchDTO">
+        INSERT INTO search values('${searchContent}', 0);
+    </insert>
+
+    <update id="increaseSearchContent" parameterType="com.app.camvil.dto.SearchDTO">
+        UPDATE search SET search_cnt = search_cnt + 1 WHERE search_content = '${searchContent}'
+    </update>
 
     <insert id="insertUser" parameterType="UserDTO">
             INSERT INTO users(user_sid, user_email, user_name, user_image_path, access_token, join_date, user_auth)
