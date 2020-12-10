@@ -1,16 +1,16 @@
 package com.app.camvil.dto;
 
 public class CommentCountDTO {
-    private int boardId;
-    private int commentCnt;
+    private long boardId;
+    private long commentCnt;
 
     public CommentCountDTO() {}
 
-    public int getBoardId() {
+    public long getBoardId() {
         return boardId;
     }
 
-    public int getCommentCnt() {
+    public long getCommentCnt() {
         return commentCnt;
     }
 }

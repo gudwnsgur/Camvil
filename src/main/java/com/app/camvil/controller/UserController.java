@@ -36,7 +36,7 @@ public class UserController {
     MyPageResponseDTO : userEmail, userName, userImagePath, joinDate
     */
     @RequestMapping(value = "/user", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
-    public String user(@RequestBody String request){
+    public String user(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
 
@@ -44,12 +44,13 @@ public class UserController {
         MyPageRequestDTO myPageRequestDTO = gson.fromJson(request, MyPageRequestDTO.class);
         UserDTO user = userService.findUserByUserId(myPageRequestDTO.getUserId());
 
-        if(user == null) {
+        if (user == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
         MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(
+                user.getUserId(),
                 user.getUserEmail(),
                 user.getUserName(),
                 user.getUserImagePath(),
@@ -78,27 +79,29 @@ public class UserController {
         UserUpdateRequestDTO userUpdateRequestDTO = gson.fromJson(request, UserUpdateRequestDTO.class);
         UserDTO user = userService.findUserByUserId(userUpdateRequestDTO.getUserId());
 
-        if(userService.findUserByUserId(userUpdateRequestDTO.getUserId()) == null) {
+        if (userService.findUserByUserId(userUpdateRequestDTO.getUserId()) == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
 
-
+        // BASE64 decoding & save image file
         // delete original user profile image
         imageService.deleteImage(user.getUserImagePath());
 
-        // BASE64 decoding & save image file
         String newImageName = imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
+        user.setUserImagePath(imagePath + "/" + newImageName);
 
-        // update user
-        user.setUserImagePath(imagePath + "/"  + newImageName);
+
         user.setUserName(userUpdateRequestDTO.getUserName());
         userService.updateUser(user);
-
         // make response
         MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(
-                user.getUserEmail(), user.getUserName(), user.getUserImagePath(), user.getJoinDate());
+                user.getUserId(),
+                user.getUserEmail(),
+                user.getUserName(),
+                user.getUserImagePath(),
+                user.getJoinDate());
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
@@ -122,7 +125,7 @@ public class UserController {
         UserDTO user = userService.findUserByUserId(userDeleteRequestDTO.getUserId());
 
         // if not found
-        if(user == null) {
+        if (user == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -130,16 +133,16 @@ public class UserController {
 
         // delete user profile image
         imageService.deleteImage(user.getUserImagePath());
-        int userId = user.getUserId(); // user
+        long userId = user.getUserId(); // user
         List<BoardDTO> boards = boardService.findBoardsByUserId(user.getUserId()); // boards
 
         // delete boards
-        for(int i=0; i<boards.size(); i++) {
-            int boardId = boards.get(i).getBoardId();
+        for (int i = 0; i < boards.size(); i++) {
+            long boardId = boards.get(i).getBoardId();
 
             // 사진 파일 찾아서 물리적 삭제 : findImagesByBoardId
             List<ImageDTO> images = imageService.findImagesByBoardId(boardId);
-            for(int j=0; j<images.size(); j++) {
+            for (int j = 0; j < images.size(); j++) {
                 String imagePaths = images.get(j).getImagePath();
                 String imageName = images.get(j).getImageName();
                 imageService.deleteImage(imagePaths, imageName);
@@ -152,12 +155,12 @@ public class UserController {
 
         // decrease likes
         List<LikeDTO> likes = likeService.findLikeBoardsByUserId(user.getUserId());
-        for(int i=0; i<likes.size(); i++) {
+        for (int i = 0; i < likes.size(); i++) {
             boardService.decreaseLike(likes.get(i).getBoardId());
         }
         // decrease comments
         List<CommentCountDTO> comments = commentService.countCommentsByUserId(user.getUserId());
-        for(int i=0; i<comments.size(); i++ ) {
+        for (int i = 0; i < comments.size(); i++) {
             boardService.decreaseCommentsByBoardId(comments.get(i).getCommentCnt(), comments.get(i).getBoardId());
         }
 

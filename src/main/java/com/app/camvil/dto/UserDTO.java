@@ -4,7 +4,7 @@ import org.apache.ibatis.type.Alias;
 
 @Alias("UserDto")
 public class UserDTO {
-    private int userId;
+    private long userId;
     private String userSid;
     private String userEmail;
     private String userName;
@@ -57,7 +57,7 @@ public class UserDTO {
     }
 
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
@@ -77,7 +77,7 @@ public class UserDTO {
         this.userSid = userSid;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 

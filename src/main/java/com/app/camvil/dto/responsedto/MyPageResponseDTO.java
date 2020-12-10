@@ -1,13 +1,15 @@
 package com.app.camvil.dto.responsedto;
 
 public class MyPageResponseDTO {
+    private long userId;
     private String userEmail;
     private String userName;
     private String userImagePath;
     private String joinDate;
 
-    public MyPageResponseDTO(String userEmail, String userName,
+    public MyPageResponseDTO(long userId, String userEmail, String userName,
                              String userImagePath, String joinDate) {
+        this.userId = userId;
         this.userEmail = userEmail;
         this.userName = userName;
         this.userImagePath = userImagePath;
@@ -43,5 +45,13 @@ public class MyPageResponseDTO {
 
     public void setJoinDate(String joinDate) {
         this.joinDate = joinDate;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 }

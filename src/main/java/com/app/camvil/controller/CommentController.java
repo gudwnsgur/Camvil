@@ -7,6 +7,7 @@ import com.app.camvil.dto.requestdto.CommentCreateRequestDTO;
 import com.app.camvil.dto.requestdto.CommentDeleteRequestDTO;
 import com.app.camvil.dto.requestdto.CommentUpdateRequestDTO;
 import com.app.camvil.dto.responsedto.CommentDetailResponseDTO;
+import com.app.camvil.dto.responsedto.CommentResponseDTO;
 import com.app.camvil.service.BoardService;
 import com.app.camvil.service.CommentService;
 import com.app.camvil.service.UserService;
@@ -65,10 +66,12 @@ public class CommentController {
         // comment count + 1 in board
         boardService.increaseComment(commentCreateRequestDTO.getBoardId());
 
+        CommentDTO comment = commentService.findLastCommentId();
+
         // response
-        response.put("responseCode", 204);
-        response.put("responseMessage", "No Content");
-        response.put("responseBody", null);
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", comment);
         return gson.toJson(response);
     }
 
@@ -107,10 +110,12 @@ public class CommentController {
                 commentUpdateRequestDTO.getCommentContent());
         commentService.updateComment(commentDTO);
 
+        CommentDTO comment = commentService.findLastCommentId();
+
         // response
-        response.put("responseCode", 204);
-        response.put("responseMessage", "No Content");
-        response.put("responseBody", null);
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", comment);
         return gson.toJson(response);
     }
 
@@ -161,6 +166,7 @@ public class CommentController {
         return gson.toJson(response);
     }
 
+
     // 상세한 댓글 보기
     /*
     request : boardId
@@ -178,7 +184,10 @@ public class CommentController {
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
+
+
         Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("boardId", board.getBoardId());
         responseBody.put("commentCnt", boardService.getCommentCountByBoardId(board.getBoardId()));
 
         List<CommentDetailResponseDTO> commentDetailResponseDTOS =

@@ -1,6 +1,7 @@
 package com.app.camvil.service;
 
 import com.app.camvil.dto.BoardDTO;
+import com.app.camvil.dto.BoardsDTO;
 import com.app.camvil.dto.responsedto.CampsiteCountResponseDTO;
 import com.app.camvil.repository.BoardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,17 +14,24 @@ public class BoardService {
     @Autowired
     private BoardRepository repository;
 
+    public List<BoardsDTO> getBoards(String search, String campsiteCode, String order,
+                              int limit, int offset) {
+        System.out.println(search);
+        System.out.println(campsiteCode);
+        System.out.println(order);
+        System.out.println(limit);
+        System.out.println(offset);
+        return repository.getBoards(search, campsiteCode, order, limit, offset);
+    }
     public BoardDTO findLastBoardId() {return repository.findLastBoardId();}
-    public BoardDTO findBoardByBoardId(int boardId) {
+    public BoardDTO findBoardByBoardId(long boardId) {
         return repository.findBoardByBoardId(boardId);
     }
-    public List<BoardDTO> findBoardsByUserId(int userId) {
+    public List<BoardDTO> findBoardsByUserId(long userId) {
         return repository.findBoardsByUserId(userId);
     }
 
-    public List<BoardDTO> getBoards() {
-        return repository.getBoards();
-    }
+
     public  List<BoardDTO> getBoardsWithLikeCount() {
         return repository.getBoardsWithLikeCount();
     }
@@ -33,8 +41,11 @@ public class BoardService {
     public List<CampsiteCountResponseDTO> getCampsiteCount() {
         return repository.getCampsiteCount();
     }
-    public int getCommentCountByBoardId(int boardId) {
+    public long getCommentCountByBoardId(long boardId) {
         return repository.getCommentCountByBoardId(boardId);
+    }
+    public long getTotalBoardCnt(String search, String campsiteCode, String order) {
+        return repository.getTotalBoardCnt(search, campsiteCode, order);
     }
 
     public void insertBoard(BoardDTO boardDTO) {
@@ -43,23 +54,23 @@ public class BoardService {
     public void updateBoard(BoardDTO boardDTO) {
         repository.updateBoard(boardDTO);
     }
-    public void increaseLike(int boardId) {
+    public void increaseLike(long boardId) {
         repository.increaseLike(boardId);
     }
-    public void decreaseLike(int boardId) {
+    public void decreaseLike(long boardId) {
         repository.decreaseLike(boardId);
     }
-    public void increaseComment(int boardId) {
+    public void increaseComment(long boardId) {
         repository.increaseComment(boardId);
     }
-    public void decreaseComment(int boardId) {
+    public void decreaseComment(long boardId) {
         repository.decreaseComment(boardId);
     }
-    public void decreaseCommentsByBoardId(int commentCnt, int boardId) {
+    public void decreaseCommentsByBoardId(long commentCnt, long boardId) {
         repository.decreaseCommentsByBoardId(commentCnt, boardId);
     }
 
-    public void deleteBoard(int boardId) {
+    public void deleteBoard(long boardId) {
         repository.deleteBoard(boardId);
     }
 

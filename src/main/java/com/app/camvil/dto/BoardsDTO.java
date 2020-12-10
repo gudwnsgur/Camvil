@@ -1,11 +1,10 @@
-package com.app.camvil.dto.responsedto;
+package com.app.camvil.dto;
 
-import com.app.camvil.dto.BoardsDTO;
-import com.app.camvil.dto.ImageListDTO;
+import com.app.camvil.dto.responsedto.CommentDetailResponseDTO;
 
 import java.util.List;
 
-public class BoardsResponseDTO {
+public class BoardsDTO {
     private long boardId;
     private long userId;
     private String userImagePath;
@@ -15,32 +14,11 @@ public class BoardsResponseDTO {
     private double mapX;
     private double mapY;
     private String boardContent;
-    private List<ImageListDTO> images;
-    private List<CommentDetailResponseDTO> comments;
     private String postDate;
     private long commentCnt;
     private long likeCnt;
 
-    public BoardsResponseDTO() {}
-
-    public BoardsResponseDTO(BoardsDTO boardsDTO,
-                             List<ImageListDTO> images,
-                             List<CommentDetailResponseDTO> comments ) {
-        this.boardId = boardsDTO.getBoardId();
-        this.userId = boardsDTO.getUserId();
-        this.userImagePath = boardsDTO.getUserImagePath();
-        this.userName = boardsDTO.getUserName();
-        this.campsiteCode = boardsDTO.getCampsiteCode();
-        this.campsiteName = boardsDTO.getCampsiteName();
-        this.mapX = boardsDTO.getMapX();
-        this.mapY = boardsDTO.getMapY();
-        this.boardContent = boardsDTO.getBoardContent();
-        this.images = images;
-        this.comments = comments;
-        this.postDate = boardsDTO.getPostDate();
-        this.commentCnt = boardsDTO.getCommentCnt();
-        this.likeCnt = boardsDTO.getLikeCnt();
-    }
+    public BoardsDTO () {}
     public long getBoardId() {
         return boardId;
     }
@@ -97,14 +75,6 @@ public class BoardsResponseDTO {
         this.mapX = mapX;
     }
 
-    public double getMapY() {
-        return mapY;
-    }
-
-    public void setMapY(double mapY) {
-        this.mapY = mapY;
-    }
-
     public String getBoardContent() {
         return boardContent;
     }
@@ -113,20 +83,12 @@ public class BoardsResponseDTO {
         this.boardContent = boardContent;
     }
 
-    public List<ImageListDTO> getImages() {
-        return images;
+    public double getMapY() {
+        return mapY;
     }
 
-    public void setImages(List<ImageListDTO> images) {
-        this.images = images;
-    }
-
-    public List<CommentDetailResponseDTO> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<CommentDetailResponseDTO> comments) {
-        this.comments = comments;
+    public void setMapY(double mapY) {
+        this.mapY = mapY;
     }
 
     public String getPostDate() {

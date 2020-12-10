@@ -1,6 +1,7 @@
 package com.app.camvil.service;
 
 import com.app.camvil.dto.ImageDTO;
+import com.app.camvil.dto.ImageListDTO;
 import com.app.camvil.repository.ImageRepository;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,10 +93,11 @@ public class ImageService {
         repository.insertImages(imageDTO);
         return;
     }
-    public List<ImageDTO> findImagesByBoardId(int boardId) {
+    public List<ImageDTO> findImagesByBoardId(long boardId) {
         return repository.findImagesByBoardId(boardId);
     }
-    public void deleteImagesByBoardId(int boardId) {
+    public List<ImageListDTO> findImageListByBoardId(long boardId) {return repository.findImageListByBoardId(boardId);}
+    public void deleteImagesByBoardId(long boardId) {
         repository.deleteImagesByBoardId(boardId);
     }
 }

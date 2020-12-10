@@ -25,10 +25,10 @@ public class UserService {
     public void updateUserToken(UserDTO user) {
         repository.updateUserToken(user);
     }
-    public UserDTO findUserByUserId(int userId) {return repository.findUserByUserId(userId);}
+    public UserDTO findUserByUserId(long userId) {return repository.findUserByUserId(userId);}
     public UserDTO findUserByUserSid(String userSid) {return repository.findUserByUserSid(userSid);}
 
-    public void deleteUser(int userId) {
+    public void deleteUser(long userId) {
         repository.deleteUser(userId);
     }
 

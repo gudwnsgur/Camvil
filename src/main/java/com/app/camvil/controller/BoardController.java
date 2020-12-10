@@ -1,15 +1,11 @@
 package com.app.camvil.controller;
 
-import com.app.camvil.dto.BoardDTO;
-import com.app.camvil.dto.CampsiteDTO;
-import com.app.camvil.dto.ImageDTO;
-import com.app.camvil.dto.UserDTO;
+import com.app.camvil.dto.*;
 import com.app.camvil.dto.requestdto.BoardCreateRequestDTO;
 import com.app.camvil.dto.requestdto.BoardDeleteRequestDTO;
 import com.app.camvil.dto.requestdto.BoardUpdateRequestDTO;
 import com.app.camvil.dto.requestdto.BoardsRequestDTO;
-import com.app.camvil.dto.responsedto.BoardCreateResponseDTO;
-import com.app.camvil.dto.responsedto.CampsiteCountResponseDTO;
+import com.app.camvil.dto.responsedto.*;
 import com.app.camvil.service.*;
 
 import com.google.gson.Gson;
@@ -38,48 +34,48 @@ public class BoardController {
     @Autowired
     private CommentService commentService;
 
-    // postman에 url 추가 O
-    // search Table 생성 ( search_id, search_content, search_cnt ) (search_cnt 크기 순서로 정렬) O
-    // user table user_image_path 추가 (프로필 이미지) => images/users/abcdefg.jpg    O
-    // board table, comment table post_date 순으로 재정렬 X 불가능
-    // 프로시져 사용
-    // paging 처리
-    // 게시물 조회, 댓글 상세 조회
-    // 마이페이지 : 프로필 사진 변경, 닉네임 변경
-    // 로그아웃, 회원탈퇴
-    // 파일 경로 resource 접근 지정 src/main/resources
-
-    // 게시물 조회
-    /*
-     BoardCreateRequestDTO : order = (  like_count ) or null(post_date)
-
-                             mapX = (123.123, 246.321) or null
-                             mapY = (124, 127) or null
-                                            or
-                             campsiteCode = ( ,   ,   ,   ,  ) or null
-
-                             search : ("") or null
-
-                             pageNumber, pageSize
-
-
-     BoardCreateResponseDTO : userName, userImagePath, boardContent, campsiteName, images, postDate, commentCount, likeCount, comment 2개
-                               pageNumber, pageSize, total, mapX, mapY
-     */
     @RequestMapping(value = "/boards", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String boards(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
-
+        Map<String, Object> responseBody = new HashMap<>();
         BoardsRequestDTO boardsRequestDTO = gson.fromJson(request, BoardsRequestDTO.class);
+        boardsRequestDTO.setPageNumber();
 
-        // 같이 고민해봅시다.
+        String order = (boardsRequestDTO.getOrder() == null ||
+                boardsRequestDTO.getOrder().equals("post_date")) ? "post_date" : "like_cnt";
+        String campsiteCode = boardsRequestDTO.getCampsiteCode() == null ? "" : boardsRequestDTO.getCampsiteCode();
+        String search =  boardsRequestDTO.getSearch() == null ? "" : boardsRequestDTO.getSearch();
+        long total = boardService.getTotalBoardCnt(search, campsiteCode, order);
+
+        List<BoardsDTO> boardsDTOS = boardService.getBoards(search, campsiteCode, order,
+                boardsRequestDTO.getPageSize(),
+                boardsRequestDTO.getPageSize()*(boardsRequestDTO.getPageNumber()-1));
 
 
+        List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<BoardsResponseDTO>();
+        System.out.println(boardsDTOS.size());
+
+        Map<String, Object> boardMap = new HashMap<>();
+        for(int i=0; i<boardsDTOS.size(); i++) {
+            long curBoardId = boardsDTOS.get(i).getBoardId();
+            System.out.println(curBoardId);
+            List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
+            List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
+
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            boardsResponseDTO.add(curBoard);
+        }
+
+        responseBody.put("boards", boardsResponseDTO);
+        responseBody.put("pageNumber", boardsRequestDTO.getPageNumber());
+        responseBody.put("pageSize", boardsRequestDTO.getPageSize());
+        responseBody.put("total", total);
+
+
+        response.put("responseBody", responseBody);
         return gson.toJson(response);
     }
-
-
 
     // 게시물 생성
     /*
@@ -89,9 +85,7 @@ public class BoardController {
     @RequestMapping(value = "/board/create", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String boardCreate(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
-        String imagePath = imageService.getBasePath();
         Map<String, Object> response = new HashMap<>();
-
 
         // json to boardCreateRequestDTO
         BoardCreateRequestDTO boardCreateRequestDTO = gson.fromJson(request, BoardCreateRequestDTO.class);
@@ -111,14 +105,15 @@ public class BoardController {
             campsiteService.insertCampsite(campsite);
         }
 
-        // decoding images
-        ArrayList<String> responseImagePath = new ArrayList<String>();
-        ArrayList<String> imageNames = new ArrayList<String>();
-        for (int i = 0; i < boardCreateRequestDTO.getImages().size(); i++) {
-            imageNames.add(imageService.getImageNames(boardCreateRequestDTO.getImages().get(i)));
-            responseImagePath.add(imagePath + "/" + imageNames.get(i));
-        }
 
+        ArrayList<String> imageNames = new ArrayList<String>();
+        if( boardCreateRequestDTO.getImages() != null
+                && !boardCreateRequestDTO.getImages().isEmpty()) {
+            // decoding images
+            for (int i = 0; i < boardCreateRequestDTO.getImages().size(); i++) {
+                imageNames.add(imageService.getImageNames(boardCreateRequestDTO.getImages().get(i)));
+            }
+        }
         // insert board in boards table
         BoardDTO board = new BoardDTO(boardCreateRequestDTO.getUserId(),
                 boardCreateRequestDTO.getCampsiteCode(),
@@ -126,21 +121,32 @@ public class BoardController {
         );
         boardService.insertBoard(board);
 
+
+        long curBoardId = boardService.findLastBoardId().getBoardId();
+        UserDTO user = userService.findUserByUserId(boardCreateRequestDTO.getUserId());
+
+        if(imageNames != null && !imageNames.isEmpty()) {
+            // insert images in images table
+            for (int i = 0; i < imageNames.size(); i++) {
+                ImageDTO image = new ImageDTO(curBoardId,
+                        imageNames.get(i),
+                        imageService.getBasePath());
+                imageService.insertImages(image);
+            }
+        }
+        List<ImageListDTO> responseImageList = imageService.findImageListByBoardId(curBoardId);
+
         // make response body
         BoardCreateResponseDTO boardCreateResponseDTO = new BoardCreateResponseDTO(
+                curBoardId,
+                user.getUserId(),
+                user.getUserName(),
+                user.getUserImagePath(),
                 boardCreateRequestDTO.getBoardContent(),
                 boardCreateRequestDTO.getCampsiteCode(),
-                responseImagePath
+                responseImageList
         );
 
-        // insert images in images table
-        int curBoardId = boardService.findLastBoardId().getBoardId();
-        for (int i = 0; i < imageNames.size(); i++) {
-            ImageDTO image = new ImageDTO(curBoardId,
-                    imageNames.get(i),
-                    imageService.getBasePath());
-            imageService.insertImages(image);
-        }
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
@@ -189,17 +195,17 @@ public class BoardController {
         board.setCampsiteCode(boardUpdateRequestDTO.getCampsiteCode());
         boardService.updateBoard(board);
 
-        List<ImageDTO> images = imageService.findImagesByBoardId(board.getBoardId());
-        ArrayList<String> responseImagePath = new ArrayList<String>();
+        List<ImageListDTO> responseImageList = imageService.findImageListByBoardId(boardUpdateRequestDTO.getBoardId());
 
-        for(int i=0; i<images.size(); i++) {
-            responseImagePath.add(images.get(i).getImagePath() + "/" + images.get(i).getImageName());
-        }
         // make response body
         BoardCreateResponseDTO boardCreateResponseDTO = new BoardCreateResponseDTO(
+                boardUpdateRequestDTO.getBoardId(),
+                user.getUserId(),
+                user.getUserName(),
+                user.getUserImagePath(),
                 boardUpdateRequestDTO.getBoardContent(),
                 boardUpdateRequestDTO.getCampsiteCode(),
-                responseImagePath
+                responseImageList
         );
         // response
         response.put("responseCode", 200);

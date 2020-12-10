@@ -2,7 +2,7 @@ package com.app.camvil.dto.responsedto;
 
 public class CampsiteCountResponseDTO {
     private String campsiteCode;
-    private int boardCnt;
+    private long boardCnt;
 
     public CampsiteCountResponseDTO() {
 
@@ -16,11 +16,11 @@ public class CampsiteCountResponseDTO {
         this.campsiteCode = campsiteCode;
     }
 
-    public int getBoardCnt() {
+    public long getBoardCnt() {
         return boardCnt;
     }
 
-    public void setBoardCnt(int boardCnt) {
+    public void setBoardCnt(long boardCnt) {
         this.boardCnt = boardCnt;
     }
 }

@@ -1,14 +1,14 @@
 package com.app.camvil.dto.requestdto;
 
 public class BoardDeleteRequestDTO {
-    private int userId;
-    private int boardId;
-    BoardDeleteRequestDTO(int userId, int boardId) {
+    private long userId;
+    private long boardId;
+    BoardDeleteRequestDTO(long userId, long boardId) {
         this.userId = userId;
         this.boardId = boardId;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
@@ -16,7 +16,7 @@ public class BoardDeleteRequestDTO {
         this.userId = userId;
     }
 
-    public int getBoardId() {
+    public long getBoardId() {
         return boardId;
     }
 

@@ -1,13 +1,13 @@
 package com.app.camvil.dto.requestdto;
 
 public class UserDeleteRequestDTO {
-    private int userId;
+    private long userId;
 
-    UserDeleteRequestDTO (int userId) {
+    UserDeleteRequestDTO (long userId) {
         this.userId = userId;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 }

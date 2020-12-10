@@ -1,21 +1,21 @@
 package com.app.camvil.dto.requestdto;
 
 public class LikeRequestDTO {
-    private int userId;
-    private int boardId;
+    private long userId;
+    private long boardId;
     private String like_;
 
-    public LikeRequestDTO(int userId, int boardId, String like_) {
+    public LikeRequestDTO(long userId, long boardId, String like_) {
         this.userId = userId;
         this.boardId = boardId;
         this.like_ = like_;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public int getBoardId() {
+    public long getBoardId() {
         return boardId;
     }
 

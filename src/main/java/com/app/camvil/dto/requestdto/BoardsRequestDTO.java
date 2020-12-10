@@ -1,37 +1,40 @@
 package com.app.camvil.dto.requestdto;
 
 public class BoardsRequestDTO {
-    private String order;
-    private String filter;
-    private String campsiteCode;
+    private String order;   // null or "like_count"
+    private String campsiteCode; // null or "[CAMPSITE CODE]"
+    private String search;
+    private int pageNumber;
+    private int pageSize;
 
-    public BoardsRequestDTO(String order, String filter, String campsiteCode) {
+    public BoardsRequestDTO(String order, String campsiteCode, String search,
+                            int pageNumber, int pageSize) {
         this.order = order;
-        this.filter = filter;
         this.campsiteCode = campsiteCode;
+        this.search = search;
+        this.pageNumber = pageNumber;
+        this.pageSize = pageSize;
     }
-
+    public void setPageNumber() {
+        if(this.pageNumber == 0 ) this.pageNumber = 1;
+    }
     public String getOrder() {
         return order;
-    }
-
-    public void setOrder(String order) {
-        this.order = order;
-    }
-
-    public String getFilter() {
-        return filter;
-    }
-
-    public void setFilter(String filter) {
-        this.filter = filter;
     }
 
     public String getCampsiteCode() {
         return campsiteCode;
     }
 
-    public void setCampsiteCode(String campsiteCode) {
-        this.campsiteCode = campsiteCode;
+    public String getSearch() {
+        return search;
+    }
+
+    public int getPageNumber() {
+        return pageNumber;
+    }
+
+    public int getPageSize() {
+        return pageSize;
     }
 }

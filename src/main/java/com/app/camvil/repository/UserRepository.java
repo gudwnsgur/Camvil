@@ -11,12 +11,12 @@ import java.util.List;
 @Mapper
 public interface UserRepository {
     List<UserDTO> getUserList();
-    UserDTO findUserByUserId(int userId);
+    UserDTO findUserByUserId(long userId);
     UserDTO findUserByUserSid(String userSid);
     List<SearchDTO> getSearch();
 
     void insertUser(UserDTO user);
     void updateUser(UserDTO user);
     void updateUserToken(UserDTO user);
-    void deleteUser(int userId);
+    void deleteUser(long userId);
 }

@@ -14,18 +14,20 @@ public class CommentService {
     @Autowired
     private CommentRepository repository;
 
-    public CommentDTO findCommentByCommentId(int commentId) {
+    public CommentDTO findCommentByCommentId(long commentId) {
         return repository.findCommentByCommentId(commentId);
     }
-    public List<CommentDTO> findCommentsByBoardId(int boardId) {
+    public CommentDTO findLastCommentId() {return repository.findLastCommentId();}
+    public List<CommentDTO> findCommentsByBoardId(long boardId) {
         return repository.findCommentsByBoardId(boardId);
     }
-    public List<CommentDTO> findCommentsByUserId(int userId) {
+    public List<CommentDTO> findCommentsByUserId(long userId) {
         return repository.findCommentsByUserId(userId);
     }
-    public List<CommentDetailResponseDTO> getCommentsByBoardId(int boardId) {return repository.getCommentsByBoardId(boardId);}
+    public List<CommentDetailResponseDTO> getCommentsByBoardId(long boardId) {return repository.getCommentsByBoardId(boardId);}
+    public List<CommentDetailResponseDTO> getTwoCommentsByBoardId(long boardId) {return repository.getTwoCommentsByBoardId(boardId);}
 
-    public List<CommentCountDTO> countCommentsByUserId(int userId) {
+    public List<CommentCountDTO> countCommentsByUserId(long userId) {
         return repository.countCommentsByUserId(userId);
     }
 
@@ -36,13 +38,13 @@ public class CommentService {
         repository.updateComment(commentDTO);
     }
 
-    public void deleteCommentByCommentId(int commentId) {
+    public void deleteCommentByCommentId(long commentId) {
         repository.deleteCommentByCommentId(commentId);
     }
-    public void deleteCommentsByBoardId(int boardId) {
+    public void deleteCommentsByBoardId(long boardId) {
         repository.deleteCommentsByBoardId(boardId);
     }
-    public void deleteCommentsByUserId(int userId) {
+    public void deleteCommentsByUserId(long userId) {
         repository.deleteCommentsByUserId(userId);
     }
 }

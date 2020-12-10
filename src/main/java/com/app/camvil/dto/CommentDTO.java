@@ -4,27 +4,27 @@ import org.apache.ibatis.type.Alias;
 
 @Alias("CommentDto")
 public class CommentDTO {
-    private int commentId;
+    private long commentId;
     private String commentContent;
-    private int userId;
-    private int boardId;
+    private long userId;
+    private long boardId;
     private String postDate;
 
     public CommentDTO() {}
-    public CommentDTO(String commentContent, int userId, int boardId) {
+    public CommentDTO(String commentContent, long userId, long boardId) {
         this.commentContent = commentContent;
         this.userId = userId;
         this.boardId = boardId;
     }
-    public CommentDTO(int commentId, String commentContent) {
+    public CommentDTO(long commentId, String commentContent) {
         this.commentId = commentId;
         this.commentContent = commentContent;
     }
-    public int getCommentId() {
+    public long getCommentId() {
         return commentId;
     }
 
-    public void setCommentId(int commentId) {
+    public void setCommentId(long commentId) {
         this.commentId = commentId;
     }
 
@@ -36,19 +36,19 @@ public class CommentDTO {
         this.commentContent = commentContent;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public int getBoardId() {
+    public long getBoardId() {
         return boardId;
     }
 
-    public void setBoardId(int boardId) {
+    public void setBoardId(long boardId) {
         this.boardId = boardId;
     }
 

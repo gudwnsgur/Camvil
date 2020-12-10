@@ -19,6 +19,10 @@
     <select id="findImagesByBoardId" resultMap="imageMap">
         SELECT * FROM images WHERE board_id = '${boardId}';
     </select>
+    <select id="findImageListByBoardId" resultType="com.app.camvil.dto.ImageListDTO">
+        SELECT image_id as imageId, GROUP_CONCAT(image_path, '/', image_name) as imagePath
+        FROM images WHERE board_id = '${boardId}' GROUP BY image_id;
+    </select>
 
     <delete id="deleteImagesByBoardId" parameterType="ImageDTO">
         DELETE FROM images WHERE board_id = '${boardId}';

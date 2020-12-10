@@ -4,29 +4,29 @@ import org.apache.ibatis.type.Alias;
 
 @Alias("LikeDto")
 public class LikeDTO {
-    private int userId;
-    private int boardId;
+    private long userId;
+    private long boardId;
     private boolean like_;
 
     public LikeDTO() {}
-    public LikeDTO(int userId, int boardId) {
+    public LikeDTO(long userId, long boardId) {
         this.userId = userId;
         this.boardId = boardId;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public int getBoardId() {
+    public long getBoardId() {
         return boardId;
     }
 
-    public void setBoardId(int boardId) {
+    public void setBoardId(long boardId) {
         this.boardId = boardId;
     }
 

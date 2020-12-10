@@ -11,19 +11,21 @@ import java.util.List;
 @Repository
 @Mapper
 public interface CommentRepository {
-    CommentDTO findCommentByCommentId(int commentId);
-    List<CommentDTO> findCommentsByBoardId(int boardId);
-    List<CommentDTO> findCommentsByUserId(int userId);
+    CommentDTO findCommentByCommentId(long commentId);
+    CommentDTO findLastCommentId();
+    List<CommentDTO> findCommentsByBoardId(long boardId);
+    List<CommentDTO> findCommentsByUserId(long userId);
 
-    List<CommentDetailResponseDTO> getCommentsByBoardId(int boardId);
+    List<CommentDetailResponseDTO> getCommentsByBoardId(long boardId);
+    List<CommentDetailResponseDTO> getTwoCommentsByBoardId(long boardId);
 
-    List<CommentCountDTO> countCommentsByUserId(int userId);
+    List<CommentCountDTO> countCommentsByUserId(long userId);
 
     void insertComment(CommentDTO commentDTO);
     void updateComment(CommentDTO commentDTO);
 
-    void deleteCommentByCommentId(int commentId);
-    void deleteCommentsByBoardId(int boardId);
-    void deleteCommentsByUserId(int userId);
+    void deleteCommentByCommentId(long commentId);
+    void deleteCommentsByBoardId(long boardId);
+    void deleteCommentsByUserId(long userId);
 
 }

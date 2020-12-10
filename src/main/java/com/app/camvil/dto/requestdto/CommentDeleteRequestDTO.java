@@ -1,27 +1,27 @@
 package com.app.camvil.dto.requestdto;
 
 public class CommentDeleteRequestDTO {
-    private int commentId;
-    private int userId;
+    private long commentId;
+    private long userId;
 
-    public CommentDeleteRequestDTO( int commentId, int userId) {
+    public CommentDeleteRequestDTO( long commentId, long userId) {
         this.commentId = commentId;
         this.userId = userId;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public int getCommentId() {
+    public long getCommentId() {
         return commentId;
     }
 
-    public void setCommentId(int commentId) {
+    public void setCommentId(long commentId) {
         this.commentId = commentId;
     }
 

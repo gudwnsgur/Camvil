@@ -1,16 +1,28 @@
 package com.app.camvil.dto.responsedto;
 
+import com.app.camvil.dto.ImageListDTO;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class BoardCreateResponseDTO {
+    private long boardId;
+    private long userId;
+    private String userName;
+    private String userImagePath;
     private String boardContent;
     private String campsiteCode;
-    private ArrayList<String> imagePath;
+    private List<ImageListDTO> images;
 
-    public BoardCreateResponseDTO(String boardContent, String campsiteCode, ArrayList<String> imagePath) {
+    public BoardCreateResponseDTO(long boardId, long userId, String userName, String userImagePath,
+            String boardContent, String campsiteCode, List<ImageListDTO> images) {
+        this.boardId = boardId;
+        this.userId = userId;
+        this.userName = userName;
+        this.userImagePath = userImagePath;
         this.boardContent = boardContent;
         this.campsiteCode = campsiteCode;
-        this.imagePath = imagePath;
+        this.images = images;
     }
 
     public void setBoardContent(String boardContent) {
@@ -21,7 +33,16 @@ public class BoardCreateResponseDTO {
         this.campsiteCode = campsiteCode;
     }
 
-    public void setImagePath(ArrayList<String> imagePath) {
-        this.imagePath = imagePath;
+
+    public void setBoardId(long boardId) {
+        this.boardId = boardId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public void setImages(List<ImageListDTO> images) {
+        this.images = images;
     }
 }

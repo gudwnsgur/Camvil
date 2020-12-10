@@ -4,7 +4,7 @@ package com.app.camvil.dto.requestdto;
 import java.util.ArrayList;
 
 public class BoardCreateRequestDTO {
-    private int userId;
+    private long userId;
     private String campsiteCode;
     private String campsiteName;
     private double mapX;
@@ -12,7 +12,7 @@ public class BoardCreateRequestDTO {
     private String boardContent;
     private ArrayList<String> images;
 
-    public BoardCreateRequestDTO(int userId, String campsiteCode, String campsiteName,
+    public BoardCreateRequestDTO(long userId, String campsiteCode, String campsiteName,
                                  double mapX, double mapY, String boardContent,
                                  ArrayList<String> images) {
         this.userId = userId;
@@ -24,11 +24,11 @@ public class BoardCreateRequestDTO {
         this.images = images;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 

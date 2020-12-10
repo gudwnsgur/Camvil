@@ -21,6 +21,7 @@ public class KakaoController {
     @Autowired
     private ImageService imageService;
 
+    // login 할때 admin 확인
     @RequestMapping(value = "/login/kakao")
     public String login(@RequestParam String code, HttpSession session) throws IOException {
         String accessToken = kakaoAPI.getAccessToken(code);

@@ -12,6 +12,10 @@
         <result column="user_id" property="userId"/>
         <result column="post_date" property="postDate"/>
     </resultMap>
+    <select id="findLastCommentId" resultMap="commentMap">
+        SELECT * FROM comments ORDER BY post_date DESC LIMIT 1;
+    </select>
+
     <select id="findCommentByCommentId" resultMap="commentMap">
         SELECT * FROM comments WHERE comment_id = '${commentId}';
     </select>
@@ -28,21 +32,30 @@
         GROUP BY b.board_id;
     </select>
     <select id="getCommentsByBoardId" resultType="com.app.camvil.dto.responsedto.CommentDetailResponseDTO">
-        SELECT u.user_name as userName, u.user_image_path as userImagePath,
+        SELECT u.user_id as userId, cm.comment_id as commentId,
+        u.user_name as userName, u.user_image_path as userImagePath,
         cm.comment_content as commentContent, cm.post_date as postDate
         FROM users as u, comments as cm
         WHERE cm.board_id = '${boardId}' AND u.user_id = cm.user_id
         GROUP BY cm.comment_id
         ORDER BY cm.post_date ASC;
     </select>
-
+    <select id="getTwoCommentsByBoardId" resultType="com.app.camvil.dto.responsedto.CommentDetailResponseDTO">
+        SELECT u.user_id as userId, cm.comment_id as commentId,
+        u.user_name as userName, u.user_image_path as userImagePath,
+        cm.comment_content as commentContent, cm.post_date as postDate
+        FROM users as u, comments as cm
+        WHERE cm.board_id = '${boardId}' AND u.user_id = cm.user_id
+        GROUP BY cm.comment_id
+        ORDER BY cm.post_date desc LIMIT 2;
+    </select>
     <insert id="insertComment" parameterType="CommentDTO">
         INSERT INTO comments(comment_content, user_id, board_id)
         VALUES ('${commentContent}', '${userId}', '${boardId}');
     </insert>
 
     <update id="updateComment" parameterType="CommentDTO">
-        UPDATE comments SET comment_content = '${commentContent}', post_date = now()
+        UPDATE comments SET comment_content = '${commentContent}', update_date = now()
         WHERE comment_id = '${commentId}';
     </update>
 

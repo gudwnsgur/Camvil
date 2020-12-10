@@ -1,11 +1,11 @@
 package com.app.camvil.dto.requestdto;
 
 public class UserUpdateRequestDTO {
-    private int userId;
+    private long userId;
     private String userName;
     private String userImage;
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 

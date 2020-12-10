@@ -2,15 +2,15 @@ package com.app.camvil.dto.requestdto;
 
 
 public class BoardUpdateRequestDTO {
-    private int userId;
-    private int boardId;
+    private long userId;
+    private long boardId;
     private String campsiteCode;
     private String campsiteName;
     private double mapX;
     private double mapY;
     private String boardContent;
 
-    public BoardUpdateRequestDTO(int userId, int boardId, String campsiteCode, String campsiteName,
+    public BoardUpdateRequestDTO(long userId, long boardId, String campsiteCode, String campsiteName,
                                  double mapX, double mapY, String boardContent) {
         this.userId = userId;
         this.boardId = boardId;
@@ -21,19 +21,19 @@ public class BoardUpdateRequestDTO {
         this.boardContent = boardContent;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public int getBoardId() {
+    public long getBoardId() {
         return boardId;
     }
 
-    public void setBoardId(int boardId) {
+    public void setBoardId(long boardId) {
         this.boardId = boardId;
     }
 

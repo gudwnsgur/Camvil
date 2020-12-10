@@ -5,7 +5,7 @@ import org.apache.ibatis.type.Alias;
 @Alias("SearchDto")
 public class SearchDTO {
     private String searchContent;
-    private int searchCnt;
+    private long searchCnt;
 
     public SearchDTO() {
 
@@ -18,11 +18,11 @@ public class SearchDTO {
         this.searchContent = searchContent;
     }
 
-    public int getSearchCnt() {
+    public long getSearchCnt() {
         return searchCnt;
     }
 
-    public void setSearchCnt(int searchCnt) {
+    public void setSearchCnt(long searchCnt) {
         this.searchCnt = searchCnt;
     }
 }

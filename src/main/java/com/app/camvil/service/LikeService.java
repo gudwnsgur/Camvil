@@ -12,10 +12,10 @@ public class LikeService {
     @Autowired
     private LikeRepository repository;
 
-    public LikeDTO findLike(int userId, int boardId) {
+    public LikeDTO findLike(long userId, long boardId) {
         return repository.findLike(userId, boardId);
     }
-    public List<LikeDTO> findLikeBoardsByUserId(int userId) {
+    public List<LikeDTO> findLikeBoardsByUserId(long userId) {
         return repository.findLikedBoardsByUserId(userId);
     }
     public void insertLike(LikeDTO likeDTO) {
@@ -27,9 +27,9 @@ public class LikeService {
     public void updateUnlikeToLike(LikeDTO likeDTO) {
         repository.updateUnlikeToLike(likeDTO);
     }
-    public void deleteLikesByBoardId(int boardId) {
+    public void deleteLikesByBoardId(long boardId) {
         repository.deleteLikesByBoardId(boardId);
     }
-    public void deleteLikesByUserId(int userId) {
+    public void deleteLikesByUserId(long userId) {
         repository.deleteLikesByUserId(userId);}
 }

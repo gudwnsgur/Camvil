@@ -13,6 +13,26 @@
         <result column="like_cnt" property="likeCnt"/>
         <result column="post_date" property="postDate"/>
     </resultMap>
+    
+    <select id="getBoards" resultType="com.app.camvil.dto.BoardsDTO">
+        SELECT b.board_id as boardId,
+		b.user_id as userId, u.user_image_path as userImagePath, u.user_name as userName,
+		cs.campsite_code as campsiteCode, cs.campsite_name as campsiteName,
+        cs.mapX as mapX, cs.mapY as mapY, b.board_content as boardContent,
+        b.post_date as postDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
+        FROM boards as b, users as u, campsites as cs
+        WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
+        AND b.board_content LIKE concat('%', '${search}' ,'%') AND cs.campsite_code LIKE concat('%', '${campsiteCode}' ,'%')
+        GROUP BY b.board_id
+        ORDER BY ${order}
+        desc LIMIT #{limit} OFFSET #{offset};
+    </select>
+
+    <select id="getTotalBoardCnt" resultType="long">
+        SELECT count(*) as cnt
+        FROM boards
+        WHERE board_content LIKE concat('%', '${search}', '%') AND campsite_code LIKE concat('%', '${campsiteCode}' ,'%');
+    </select>
 
     <select id="findLastBoardId" resultMap="boardMap">
         SELECT * FROM boards ORDER BY board_id DESC LIMIT 1;
@@ -22,9 +42,6 @@
     </select>
     <select id="findBoardsByUserId" resultMap="boardMap">
         SELECT * FROM boards WHERE user_id = '${userId}';
-    </select>
-    <select id="getBoards" resultMap="boardMap">
-        SELECT * FROM boards;
     </select>
     <select id="getBoardsWithLikeCount" resultMap="boardMap">
         SELECT * FROM boards ORDER BY like_cnt DESC;
@@ -37,7 +54,7 @@
         FROM boards
         GROUP BY campsite_code;
     </select>
-    <select id="getCommentCountByBoardId" resultType="int">
+    <select id="getCommentCountByBoardId" resultType="long">
         SELECT comment_cnt FROM boards WHERE board_id = '${board_id}';
     </select>
 
@@ -49,7 +66,7 @@
 
     <update id="updateBoard" parameterType="BoardDTO">
         UPDATE boards
-        SET board_content='${boardContent}', campsite_code='${campsiteCode}', post_date=now()
+        SET board_content='${boardContent}', campsite_code='${campsiteCode}', update_date=now()
         WHERE board_id = '${boardId}';
     </update>
     <update id="increaseLike" parameterType="BoardDTO">

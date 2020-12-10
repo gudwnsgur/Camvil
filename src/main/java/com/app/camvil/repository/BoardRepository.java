@@ -1,6 +1,7 @@
 package com.app.camvil.repository;
 
 import com.app.camvil.dto.BoardDTO;
+import com.app.camvil.dto.BoardsDTO;
 import com.app.camvil.dto.responsedto.CampsiteCountResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -10,24 +11,26 @@ import java.util.List;
 @Repository
 @Mapper
 public interface BoardRepository {
-    BoardDTO findLastBoardId();
-    BoardDTO findBoardByBoardId(int boardId);
-    List<BoardDTO> findBoardsByUserId(int userId);
+    List<BoardsDTO> getBoards(String search, String campsiteCode, String order,
+                              int limit, int offset);
 
-    List<BoardDTO> getBoards();
+    BoardDTO findLastBoardId();
+    BoardDTO findBoardByBoardId(long boardId);
+    List<BoardDTO> findBoardsByUserId(long userId);
+
     List<BoardDTO> getBoardsWithLikeCount();
     List<BoardDTO> getBoardsByCampsiteCode(String campsiteCode);
 
     List<CampsiteCountResponseDTO> getCampsiteCount();
-    int getCommentCountByBoardId(int boardId);
-
+    long getCommentCountByBoardId(long boardId);
+    long getTotalBoardCnt(String search, String campsiteCode, String order);
     void insertBoard(BoardDTO boardDTO);
     void updateBoard(BoardDTO boardDTO);
-    void increaseLike(int boardId);
-    void decreaseLike(int boardId);
-    void increaseComment(int boardId);
-    void decreaseComment(int boardId);
-    void decreaseCommentsByBoardId(int commentCnt, int boardId);
+    void increaseLike(long boardId);
+    void decreaseLike(long boardId);
+    void increaseComment(long boardId);
+    void decreaseComment(long boardId);
+    void decreaseCommentsByBoardId(long commentCnt, long boardId);
 
-    void deleteBoard(int boardId);
+    void deleteBoard(long boardId);
 }

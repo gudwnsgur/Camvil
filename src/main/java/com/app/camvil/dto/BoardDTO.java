@@ -4,26 +4,26 @@ import org.apache.ibatis.type.Alias;
 
 @Alias("BoardDto")
 public class BoardDTO {
-    private int boardId;
-    private int userId;
+    private long boardId;
+    private long userId;
     private String campsiteCode;
     private String boardContent;
-    private int commentCnt;
-    private int likeCnt;
+    private long commentCnt;
+    private long likeCnt;
     private String postDate;
 
-    public BoardDTO(int userId, String campsiteCode,
+    public BoardDTO(long userId, String campsiteCode,
                     String boardContent) {
         this.userId = userId;
         this.campsiteCode = campsiteCode;
         this.boardContent = boardContent;
     }
 
-    public int getBoardId() {
+    public long getBoardId() {
         return boardId;
     }
 
-    public void setBoardId(int boardId) {
+    public void setBoardId(long boardId) {
         this.boardId = boardId;
     }
 
@@ -44,27 +44,27 @@ public class BoardDTO {
         this.boardContent = boardContent;
     }
 
-    public int getCommentCnt() {
+    public long getCommentCnt() {
         return commentCnt;
     }
 
-    public void setCommentCnt(int commentCnt) {
+    public void setCommentCnt(long commentCnt) {
         this.commentCnt = commentCnt;
     }
 
-    public int getLikeCnt() {
+    public long getLikeCnt() {
         return likeCnt;
     }
 
-    public void setLikeCnt(int likeCnt) {
+    public void setLikeCnt(long likeCnt) {
         this.likeCnt = likeCnt;
     }
 
-    public int getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 

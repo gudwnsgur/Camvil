@@ -9,13 +9,13 @@ import java.util.List;
 @Repository
 @Mapper
 public interface LikeRepository {
-    LikeDTO findLike(int userId, int boardId);
-    List<LikeDTO> findLikedBoardsByUserId(int userId);
+    LikeDTO findLike(long userId, long boardId);
+    List<LikeDTO> findLikedBoardsByUserId(long userId);
 
     void insertLike(LikeDTO likeDTO);
     void updateLikeToUnlike(LikeDTO likeDTO);
     void updateUnlikeToLike(LikeDTO likeDTO);
 
-    void deleteLikesByBoardId(int boardId);
-    void deleteLikesByUserId(int userId);
+    void deleteLikesByBoardId(long boardId);
+    void deleteLikesByUserId(long userId);
 }

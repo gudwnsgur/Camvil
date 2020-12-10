@@ -4,33 +4,33 @@ import org.apache.ibatis.type.Alias;
 
 @Alias("ImageDto")
 public class ImageDTO {
-    private int imageId;
-    private int boardId;
+    private long imageId;
+    private long boardId;
     private String imageName;
     private String imagePath;
 
     public ImageDTO(){
 
     }
-    public ImageDTO(int board_id, String imageName, String imagePath) {
+    public ImageDTO(long board_id, String imageName, String imagePath) {
         this.boardId = board_id;
         this.imageName = imageName;
         this.imagePath = imagePath;
     }
 
-    public int getImageId() {
+    public long getImageId() {
         return imageId;
     }
 
-    public void setImageId(int imageId) {
+    public void setImageId(long imageId) {
         this.imageId = imageId;
     }
 
-    public int getBoardId() {
+    public long getBoardId() {
         return boardId;
     }
 
-    public void setBoardId(int boardId) {
+    public void setBoardId(long boardId) {
         this.boardId = boardId;
     }
 
