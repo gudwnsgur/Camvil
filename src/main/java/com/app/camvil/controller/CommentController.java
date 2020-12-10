@@ -110,12 +110,12 @@ public class CommentController {
                 commentUpdateRequestDTO.getCommentContent());
         commentService.updateComment(commentDTO);
 
-        CommentDTO comment = commentService.findLastCommentId();
 
+        commentDTO = commentService.findCommentByCommentId(commentUpdateRequestDTO.getCommentId());
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
-        response.put("responseBody", comment);
+        response.put("responseBody", commentDTO);
         return gson.toJson(response);
     }
 
