@@ -6,7 +6,7 @@ public class BoardsRequestDTO {
     private String search;
     private int pageNumber;
     private int pageSize;
-
+    public BoardsRequestDTO(){}
     public BoardsRequestDTO(String order, String campsiteCode, String search,
                             int pageNumber, int pageSize) {
         this.order = order;

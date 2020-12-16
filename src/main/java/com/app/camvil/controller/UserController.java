@@ -1,10 +1,10 @@
 package com.app.camvil.controller;
 
 import com.app.camvil.dto.*;
-import com.app.camvil.dto.requestdto.MyPageRequestDTO;
-import com.app.camvil.dto.requestdto.UserDeleteRequestDTO;
-import com.app.camvil.dto.requestdto.UserUpdateRequestDTO;
+import com.app.camvil.dto.requestdto.*;
+import com.app.camvil.dto.responsedto.LoginResponseDTO;
 import com.app.camvil.dto.responsedto.MyPageResponseDTO;
+import com.app.camvil.dto.responsedto.SignUpResponseDTO;
 import com.app.camvil.service.*;
 
 import com.google.gson.Gson;
@@ -30,11 +30,80 @@ public class UserController {
     @Autowired
     private LikeService likeService;
 
+    // sign up
+    @RequestMapping(value = "/user/singUp", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    public String signUp(@RequestBody String request) throws IOException {
+        Gson gson = new GsonBuilder().create();
+        Map<String, Object> response = new HashMap<>();
+
+        SignUpRequestDTO signUpRequestDTO = gson.fromJson(request, SignUpRequestDTO.class);
+
+        if(signUpRequestDTO.getUserSid() == null || signUpRequestDTO.getUserSid().equals("") ||
+        signUpRequestDTO.getUserName() == null || signUpRequestDTO.getUserName().equals("") ||
+        signUpRequestDTO.getFcmToken() == null || signUpRequestDTO.getFcmToken().equals("")) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+
+        UserDTO user = new UserDTO(signUpRequestDTO.getUserSid(), signUpRequestDTO.getUserEmail(),
+                signUpRequestDTO.getUserName(), signUpRequestDTO.getFcmToken());
+
+        if(userService.findUserByUserSid(user.getUserSid()) != null ) {
+            response.put("responseCode", 409);
+            response.put("responseMessage", "Conflict : already existed user");
+            return gson.toJson(response);
+        }
+
+        if(signUpRequestDTO.getImage() == null || signUpRequestDTO.getImage().equals("")) {
+            user.setUserImagePath(imageService.getBaseProfileImage());
+        } else {
+            user.setUserImagePath(imageService.getProfileImagePath(signUpRequestDTO.getImage()));
+        }
+        userService.insertUser(user);
+
+        SignUpResponseDTO signUpResponseDTO = new SignUpResponseDTO(user);
+
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", signUpResponseDTO);
+        return gson.toJson(response);
+    }
+
+    // login
+    @RequestMapping(value = "/user/login", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    public String login(@RequestBody String request) {
+        Gson gson = new GsonBuilder().create();
+        Map<String, Object> response = new HashMap<>();
+
+        LoginRequestDTO loginRequestDTO = gson.fromJson(request, LoginRequestDTO.class);
+        if(loginRequestDTO.getUserSid() == null || loginRequestDTO.getUserSid().equals("") ||
+            loginRequestDTO.getFcmToken() == null || loginRequestDTO.getFcmToken().equals("")) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+        UserDTO user = userService.findUserByUserSid(loginRequestDTO.getUserSid());
+        if(user == null ) {
+            response.put("responseCode", 409);
+            response.put("responseMessage", "Conflict : not existed user");
+            return gson.toJson(response);
+        }
+        user.setFcmToken(loginRequestDTO.getFcmToken());
+        userService.updateUserToken(user);
+
+        String userAuth = user.isUserAuth() ? "admin" : "user";
+        LoginResponseDTO loginResponseDTO = new LoginResponseDTO(user, userAuth);
+
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", loginRequestDTO);
+        return gson.toJson(response);
+    }
+
     // My Page
-    /*
-    MyPageRequestDTO : userId
-    MyPageResponseDTO : userEmail, userName, userImagePath, joinDate
-    */
     @RequestMapping(value = "/user", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String user(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
@@ -49,14 +118,8 @@ public class UserController {
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
-        MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(
-                user.getUserId(),
-                user.getUserEmail(),
-                user.getUserName(),
-                user.getUserImagePath(),
-                user.getJoinDate()
-        );
 
+        MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(user);
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
@@ -65,10 +128,6 @@ public class UserController {
     }
 
     // Update user
-     /*
-    UserUpdateRequestDTO : userId, userName, userImage(encoded),
-    MyPageResponseDTO : userEmail, userName(updated), userImagePath(updated), joinDate
-    */
     @RequestMapping(value = "/user/update", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String userUpdate(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
@@ -85,24 +144,29 @@ public class UserController {
             return gson.toJson(response);
         }
 
+        if(userUpdateRequestDTO.getUserName() == null || userUpdateRequestDTO.getUserName().equals("") ||
+           userUpdateRequestDTO.getFcmToken() == null || userUpdateRequestDTO.getFcmToken().equals("")) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+
         // BASE64 decoding & save image file
         // delete original user profile image
-        imageService.deleteImage(user.getUserImagePath());
-
-        String newImageName = imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
-        user.setUserImagePath(imagePath + "/" + newImageName);
-
-
+        if(userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage().equals("")) {
+            user.setUserImagePath(imageService.getBaseProfileImage());
+        } else {
+            imageService.deleteImage(user.getUserImagePath());
+            String newImageName = imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
+            user.setUserImagePath(imagePath + "/" + newImageName);
+        }
+        user.setFcmToken(userUpdateRequestDTO.getFcmToken());
         user.setUserName(userUpdateRequestDTO.getUserName());
+
+
         userService.updateUser(user);
-        // make response
-        MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(
-                user.getUserId(),
-                user.getUserEmail(),
-                user.getUserName(),
-                user.getUserImagePath(),
-                user.getJoinDate());
-        // response
+
+        MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(user);
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", myPageResponseDTO);
@@ -118,7 +182,6 @@ public class UserController {
     public String userDelete(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
-        String imagePath = imageService.getBasePath() + "/users";
 
         // json to MyPageRequestDTO
         UserDeleteRequestDTO userDeleteRequestDTO = gson.fromJson(request, UserDeleteRequestDTO.class);
@@ -132,7 +195,9 @@ public class UserController {
         }
 
         // delete user profile image
-        imageService.deleteImage(user.getUserImagePath());
+        if(!user.getUserImagePath().equals(imageService.getBaseProfileImage())) {
+            imageService.deleteImage(user.getUserImagePath());
+        }
         long userId = user.getUserId(); // user
         List<BoardDTO> boards = boardService.findBoardsByUserId(user.getUserId()); // boards
 

@@ -9,20 +9,26 @@ public class UserDTO {
     private String userEmail;
     private String userName;
     private String userImagePath;
-    private String accessToken;
+    private String fcmToken;
     private String joinDate;
     private boolean userAuth;
 
     public UserDTO() {}
     public UserDTO(String userSid, String userEmail,
-                   String userName, String userImagePath, String accessToken) {
+                   String userName, String userImagePath, String fcmToken) {
         this.userSid = userSid;
         this.userEmail=userEmail;
         this.userName=userName;
         this.userImagePath = userImagePath;
-        this.accessToken = accessToken;
+        this.fcmToken = fcmToken;
     }
-
+    public UserDTO(String userSid, String userEmail,
+                   String userName,  String fcmToken) {
+        this.userSid = userSid;
+        this.userEmail=userEmail;
+        this.userName=userName;
+        this.fcmToken = fcmToken;
+    }
 
     public String getUserEmail() {
         return userEmail;
@@ -40,12 +46,12 @@ public class UserDTO {
         this.userName = userName;
     }
 
-    public String getAccessToken() {
-        return accessToken;
+    public String getFcmToken() {
+        return fcmToken;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     public boolean isUserAuth() {

@@ -24,7 +24,6 @@ public class SearchController {
 
         List<SearchDTO> searchDTOList = userService.getSearch();
 
-        System.out.println(searchDTOList);
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", searchDTOList);

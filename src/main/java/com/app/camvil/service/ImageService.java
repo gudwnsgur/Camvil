@@ -19,12 +19,15 @@ import java.util.UUID;
 @Service
 public class ImageService {
     private static String BASE_PATH = "C:/camvil/camvil/src/main/resources/images";
-
+    private static String BASE_PROFILE_IMAGE =  "C:/camvil/camvil/src/main/resources/images/users/camvil_basic_image.jpg";
     @Autowired
     private ImageRepository repository;
 
     public String getBasePath() {
         return BASE_PATH;
+    }
+    public String getBaseProfileImage() {
+        return BASE_PROFILE_IMAGE;
     }
 
     public String getImageNames(String encodedString) throws IOException {

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,12 +38,15 @@ public class BoardController {
     @RequestMapping(value = "/boards", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String boards(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
+
         Map<String, Object> response = new HashMap<>();
         Map<String, Object> responseBody = new HashMap<>();
         BoardsRequestDTO boardsRequestDTO = gson.fromJson(request, BoardsRequestDTO.class);
         boardsRequestDTO.setPageNumber();
 
+
         String order = (boardsRequestDTO.getOrder() == null ||
+                boardsRequestDTO.getOrder().equals("") ||
                 boardsRequestDTO.getOrder().equals("post_date")) ? "post_date" : "like_cnt";
         String campsiteCode = boardsRequestDTO.getCampsiteCode() == null ? "" : boardsRequestDTO.getCampsiteCode();
         String search =  boardsRequestDTO.getSearch() == null ? "" : boardsRequestDTO.getSearch();
@@ -54,7 +58,6 @@ public class BoardController {
             userService.increaseSearchContent(search);
         }
 
-
         long total = boardService.getTotalBoardCnt(search, campsiteCode, order);
 
         List<BoardsDTO> boardsDTOS = boardService.getBoards(search, campsiteCode, order,
@@ -63,12 +66,10 @@ public class BoardController {
 
 
         List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<BoardsResponseDTO>();
-        System.out.println(boardsDTOS.size());
 
         Map<String, Object> boardMap = new HashMap<>();
         for(int i=0; i<boardsDTOS.size(); i++) {
             long curBoardId = boardsDTOS.get(i).getBoardId();
-            System.out.println(curBoardId);
             List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
             List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
 
@@ -81,7 +82,9 @@ public class BoardController {
         responseBody.put("pageSize", boardsRequestDTO.getPageSize());
         responseBody.put("total", total);
 
-
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
         response.put("responseBody", responseBody);
         return gson.toJson(response);
     }
