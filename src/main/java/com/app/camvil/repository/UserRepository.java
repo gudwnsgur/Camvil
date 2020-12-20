@@ -13,6 +13,7 @@ public interface UserRepository {
     List<UserDTO> getUserList();
     UserDTO findUserByUserId(long userId);
     UserDTO findUserByUserSid(String userSid);
+    boolean isExternalImage(long userId);
     List<SearchDTO> getSearch();
     SearchDTO findSearchBySearchContent(String searchContent);
     void insertSearchContent(String searchContent);

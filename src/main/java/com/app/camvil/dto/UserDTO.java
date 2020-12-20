@@ -12,6 +12,7 @@ public class UserDTO {
     private String fcmToken;
     private String joinDate;
     private boolean userAuth;
+    private boolean externalImage;
 
     public UserDTO() {}
     public UserDTO(String userSid, String userEmail,
@@ -93,5 +94,13 @@ public class UserDTO {
 
     public void setJoinDate(String joinDate) {
         this.joinDate = joinDate;
+    }
+
+    public boolean isExternalImage() {
+        return externalImage;
+    }
+
+    public void setExternalImage(boolean externalImage) {
+        this.externalImage = externalImage;
     }
 }

@@ -13,9 +13,12 @@ public class BoardCreateResponseDTO {
     private String boardContent;
     private String campsiteCode;
     private List<ImageListDTO> images;
+    private String postDate;
+    private String updateDate;
 
     public BoardCreateResponseDTO(long boardId, long userId, String userName, String userImagePath,
-            String boardContent, String campsiteCode, List<ImageListDTO> images) {
+            String boardContent, String campsiteCode, List<ImageListDTO> images,
+                                  String postDate, String updateDate) {
         this.boardId = boardId;
         this.userId = userId;
         this.userName = userName;
@@ -23,6 +26,8 @@ public class BoardCreateResponseDTO {
         this.boardContent = boardContent;
         this.campsiteCode = campsiteCode;
         this.images = images;
+        this.postDate = postDate;
+        this.updateDate = updateDate;
     }
 
     public void setBoardContent(String boardContent) {

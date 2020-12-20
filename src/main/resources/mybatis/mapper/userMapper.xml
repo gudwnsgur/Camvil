@@ -13,8 +13,12 @@
         <result column="access_token" property="fcmToken"/>
         <result column="join_date" property="joinDate"/>
         <result column="user_auth" property="userAuth"/>
+        <result column="external_image" property="externalImage"/>
     </resultMap>
 
+    <select id="isExternalImage" resultType="boolean">
+        SELECT external_image FROM users WHERE user_id = '${userId}';
+    </select>
     <select id="getUserList" resultMap="userMap">
         SELECT * FROM users;
     </select>
@@ -43,11 +47,11 @@
 
     <insert id="insertUser" parameterType="UserDTO">
             INSERT INTO users(user_sid, user_email, user_name, user_image_path, access_token, join_date, user_auth)
-            VALUES ('${userSid}','${userEmail}','${userName}','${userImagePath}','${fcmToken}',now(),false)
+            VALUES ('${userSid}','${userEmail}','${userName}','${userImagePath}','${fcmToken}',DATE_ADD(now(), INTERVAL 9 HOUR),false)
     </insert>
 
     <update id="updateUser" parameterType="UserDTO">
-            UPDATE users SET user_name = '${userName}', user_image_path='${userImagePath}'
+            UPDATE users SET user_name = '${userName}', user_image_path='${userImagePath}', external_path=false
             WHERE user_id = '${userId}';
     </update>
     <update id="updateUserToken" parameterType="UserDTO">

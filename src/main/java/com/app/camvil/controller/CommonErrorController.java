@@ -26,7 +26,6 @@ public class CommonErrorController implements ErrorController {
             response.put("responseCode", Integer.valueOf(status.toString()));
 
             if (statusCode == HttpStatus.NOT_FOUND.value()) {
-                response.put("responseCode", 400);
                 response.put("responseMessage", "NOT_FOUND");
                 return gson.toJson(response);
             } else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
@@ -52,6 +51,7 @@ public class CommonErrorController implements ErrorController {
                 response.put("responseMessage", "FAILED_DEPENDENCY");
                 return gson.toJson(response);
             }
+
         }
         response.put("responseMessage", "etc");
         return gson.toJson(response);

@@ -27,6 +27,7 @@ public class UserService {
     }
     public UserDTO findUserByUserId(long userId) {return repository.findUserByUserId(userId);}
     public UserDTO findUserByUserSid(String userSid) {return repository.findUserByUserSid(userSid);}
+    public boolean isExternalImage(long userId) {return repository.isExternalImage(userId);}
 
     public void deleteUser(long userId) {
         repository.deleteUser(userId);

@@ -31,7 +31,7 @@ public class UserController {
     private LikeService likeService;
 
     // sign up
-    @RequestMapping(value = "/user/singUp", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/signUp", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String signUp(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
@@ -58,10 +58,12 @@ public class UserController {
         if(signUpRequestDTO.getImage() == null || signUpRequestDTO.getImage().equals("")) {
             user.setUserImagePath(imageService.getBaseProfileImage());
         } else {
-            user.setUserImagePath(imageService.getProfileImagePath(signUpRequestDTO.getImage()));
+            user.setUserImagePath(signUpRequestDTO.getImage());
         }
         userService.insertUser(user);
 
+        user.setUserId(userService.findUserByUserSid(user.getUserSid()).getUserId());
+        user.setJoinDate(userService.findUserByUserSid(user.getUserSid()).getJoinDate());
         SignUpResponseDTO signUpResponseDTO = new SignUpResponseDTO(user);
 
         // response
@@ -86,8 +88,8 @@ public class UserController {
         }
         UserDTO user = userService.findUserByUserSid(loginRequestDTO.getUserSid());
         if(user == null ) {
-            response.put("responseCode", 409);
-            response.put("responseMessage", "Conflict : not existed user");
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
         user.setFcmToken(loginRequestDTO.getFcmToken());
@@ -99,7 +101,7 @@ public class UserController {
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
-        response.put("responseBody", loginRequestDTO);
+        response.put("responseBody", loginResponseDTO);
         return gson.toJson(response);
     }
 
@@ -153,10 +155,14 @@ public class UserController {
 
         // BASE64 decoding & save image file
         // delete original user profile image
-        if(userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage().equals("")) {
+        if(userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage().equals("") ||
+        userUpdateRequestDTO.getUserImage().equals(imageService.getBaseProfileImage())) {
             user.setUserImagePath(imageService.getBaseProfileImage());
         } else {
-            imageService.deleteImage(user.getUserImagePath());
+            String curImage = user.getUserImagePath();
+            if(!userService.isExternalImage(user.getUserId())) {
+                imageService.deleteImage(user.getUserImagePath());
+            }
             String newImageName = imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
             user.setUserImagePath(imagePath + "/" + newImageName);
         }

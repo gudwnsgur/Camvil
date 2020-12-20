@@ -11,6 +11,8 @@
         <result column="board_id" property="boardId"/>
         <result column="user_id" property="userId"/>
         <result column="post_date" property="postDate"/>
+        <result column="update_date" property="updateDate"/>
+
     </resultMap>
     <select id="findLastCommentId" resultMap="commentMap">
         SELECT * FROM comments ORDER BY post_date DESC LIMIT 1;
@@ -50,12 +52,12 @@
         ORDER BY cm.post_date desc LIMIT 2;
     </select>
     <insert id="insertComment" parameterType="CommentDTO">
-        INSERT INTO comments(comment_content, user_id, board_id)
-        VALUES ('${commentContent}', '${userId}', '${boardId}');
+        INSERT INTO comments(comment_content, user_id, board_id, post_date)
+        VALUES ('${commentContent}', '${userId}', '${boardId}', DATE_ADD(now(), INTERVAL 9 HOUR));
     </insert>
 
     <update id="updateComment" parameterType="CommentDTO">
-        UPDATE comments SET comment_content = '${commentContent}', update_date = now()
+        UPDATE comments SET comment_content = '${commentContent}', update_date = DATE_ADD(now(), INTERVAL 9 HOUR)
         WHERE comment_id = '${commentId}';
     </update>
 

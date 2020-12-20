@@ -11,6 +11,7 @@ public class BoardDTO {
     private long commentCnt;
     private long likeCnt;
     private String postDate;
+    private String updateDate;
 
     public BoardDTO(long userId, String campsiteCode,
                     String boardContent) {
@@ -74,5 +75,13 @@ public class BoardDTO {
 
     public void setPostDate(String postDate) {
         this.postDate = postDate;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
     }
 }

@@ -9,6 +9,7 @@ public class CommentDTO {
     private long userId;
     private long boardId;
     private String postDate;
+    private String updateDate;
 
     public CommentDTO() {}
     public CommentDTO(String commentContent, long userId, long boardId) {
@@ -58,5 +59,13 @@ public class CommentDTO {
 
     public void setPostDate(String postDate) {
         this.postDate = postDate;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
     }
 }

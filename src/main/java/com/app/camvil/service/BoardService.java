@@ -16,11 +16,6 @@ public class BoardService {
 
     public List<BoardsDTO> getBoards(String search, String campsiteCode, String order,
                               int limit, int offset) {
-        System.out.println(search);
-        System.out.println(campsiteCode);
-        System.out.println(order);
-        System.out.println(limit);
-        System.out.println(offset);
         return repository.getBoards(search, campsiteCode, order, limit, offset);
     }
     public BoardDTO findLastBoardId() {return repository.findLastBoardId();}

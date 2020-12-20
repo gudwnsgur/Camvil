@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 public class BoardController {
@@ -156,7 +153,9 @@ public class BoardController {
                 user.getUserImagePath(),
                 boardCreateRequestDTO.getBoardContent(),
                 boardCreateRequestDTO.getCampsiteCode(),
-                responseImageList
+                responseImageList,
+                boardService.findBoardByBoardId(curBoardId).getPostDate(),
+                boardService.findBoardByBoardId(curBoardId).getUpdateDate()
         );
 
         // response
@@ -217,7 +216,9 @@ public class BoardController {
                 user.getUserImagePath(),
                 boardUpdateRequestDTO.getBoardContent(),
                 boardUpdateRequestDTO.getCampsiteCode(),
-                responseImageList
+                responseImageList,
+                board.getPostDate(),
+                board.getUpdateDate()
         );
         // response
         response.put("responseCode", 200);
@@ -284,14 +285,22 @@ public class BoardController {
         List<CampsiteCountResponseDTO> campsiteCountResponseDTOS =
                 boardService.getCampsiteCount();
 
-        if(campsiteCountResponseDTOS.size() == 0) {
+        ArrayList<CampsiteCountResponseDTO> campsiteCountResponseDTOS1 = new ArrayList<>();
+
+        for(int i=0; i<campsiteCountResponseDTOS.size(); i++) {
+            if(!campsiteCountResponseDTOS.get(i).getCampsiteCode().equals("")) {
+                campsiteCountResponseDTOS1.add(campsiteCountResponseDTOS.get(i));
+            }
+        }
+
+        if(campsiteCountResponseDTOS1.size() == 0) {
             response.put("responseCode", 204);
             response.put("responseMessage", "No Content");
             return gson.toJson(response);
         }
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
-        response.put("responseBody", campsiteCountResponseDTOS);
+        response.put("responseBody", campsiteCountResponseDTOS1);
         return gson.toJson(response);
     }
 
