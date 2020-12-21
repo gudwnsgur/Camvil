@@ -139,7 +139,7 @@ public class BoardController {
             for (int i = 0; i < imageNames.size(); i++) {
                 ImageDTO image = new ImageDTO(curBoardId,
                         imageNames.get(i),
-                        imageService.getBasePath());
+                        "/images");
                 imageService.insertImages(image);
             }
         }

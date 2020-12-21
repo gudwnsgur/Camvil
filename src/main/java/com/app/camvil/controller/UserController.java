@@ -134,7 +134,7 @@ public class UserController {
     public String userUpdate(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
-        String imagePath = imageService.getBasePath() + "/users";
+        String imagePath =  "/images/users";
 
         // json to MyPageRequestDTO
         UserUpdateRequestDTO userUpdateRequestDTO = gson.fromJson(request, UserUpdateRequestDTO.class);
@@ -146,59 +146,39 @@ public class UserController {
             return gson.toJson(response);
         }
 
-        if (userUpdateRequestDTO.getUserName() == null || userUpdateRequestDTO.getUserName().equals("")) {
-            response.put("responseCode", 400);
-            response.put("responseMessage", "Bad Request");
-            return gson.toJson(response);
+        if (userUpdateRequestDTO.getUserName() != null && !userUpdateRequestDTO.getUserName().equals("")) {
+            user.setUserName(userUpdateRequestDTO.getUserName());
         }
 
-        // 안 바뀌면 path
-        // url -> null
-        // url -> real
-        // null -> real
-        // real -> real(수정)
-        // real -> null
         boolean isExternalImage = false;
         String updateImagePath = userUpdateRequestDTO.getUserImage();
         if (!user.getUserImagePath().equals(updateImagePath)) {
             // url or null =>
-            if(user.isExternalImage()) {
-                // => null
-                if(userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage() .equals("")) {
-                    updateImagePath = null;
-                    isExternalImage = true;
-                }
-                // => real
-                else {
-                    updateImagePath =  imagePath + "/" + imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
-                }
-            }
-            // real =>
-            else {
+            if (!user.isExternalImage()) {
                 imageService.deleteImage(user.getUserImagePath());
-                if(userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage() .equals("")) {
-                    updateImagePath = null;
-                    isExternalImage = true;
-                }
-                else {
-                    updateImagePath =  imagePath + "/" + imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
-                }
+            }
+            // => null
+            if (userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage().equals("")) {
+                updateImagePath = null;
+                isExternalImage = true;
+            }
+            // => real
+            else {
+                updateImagePath = imagePath + "/" + imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
             }
         }
 
-
-        user.setUserName(userUpdateRequestDTO.getUserName());
         user.setUserImagePath(updateImagePath);
         user.setExternalImage(isExternalImage);
 
         userService.updateUser(user);
 
-        MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(user);
-        response.put("responseCode", 200);
-        response.put("responseMessage", "OK");
-        response.put("responseBody", myPageResponseDTO);
+    MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(user);
+        response.put("responseCode",200);
+        response.put("responseMessage","OK");
+        response.put("responseBody",myPageResponseDTO);
         return gson.toJson(response);
-    }
+}
 
     // Delete user
      /*
@@ -222,9 +202,10 @@ public class UserController {
         }
 
         // delete user profile image
-        if (!user.getUserImagePath().equals(imageService.getBaseProfileImage())) {
+        if (!user.isExternalImage()) {
             imageService.deleteImage(user.getUserImagePath());
         }
+
         long userId = user.getUserId(); // user
         List<BoardDTO> boards = boardService.findBoardsByUserId(user.getUserId()); // boards
 
