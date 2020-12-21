@@ -23,7 +23,21 @@
         b.post_date as postDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
         FROM boards as b, users as u, campsites as cs
         WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
-        AND b.board_content LIKE concat('%', '${search}' ,'%') AND cs.campsite_code LIKE concat('%', '${campsiteCode}' ,'%')
+        AND b.board_content LIKE concat('%', '${search}' ,'%')
+        GROUP BY b.board_id
+        ORDER BY ${order}
+        desc LIMIT #{limit} OFFSET #{offset};
+    </select>
+
+    <select id="getBoardsContainsCode" resultType="com.app.camvil.dto.BoardsDTO">
+        SELECT b.board_id as boardId,
+		b.user_id as userId, u.user_image_path as userImagePath, u.user_name as userName,
+		cs.campsite_code as campsiteCode, cs.campsite_name as campsiteName,
+        cs.mapX as mapX, cs.mapY as mapY, b.board_content as boardContent,
+        b.post_date as postDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
+        FROM boards as b, users as u, campsites as cs
+        WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
+        AND b.board_content LIKE concat('%', '${search}' ,'%') AND cs.campsite_code = '${campsiteCode}'
         GROUP BY b.board_id
         ORDER BY ${order}
         desc LIMIT #{limit} OFFSET #{offset};
@@ -63,7 +77,6 @@
         INSERT INTO boards(user_id, campsite_code, board_content, post_date)
         VALUES ('${userId}', '${campsiteCode}', '${boardContent}', DATE_ADD(now(), INTERVAL 9 HOUR));
     </insert>
-
 
     <update id="updateBoard" parameterType="BoardDTO">
         UPDATE boards

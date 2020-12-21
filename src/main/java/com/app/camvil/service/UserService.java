@@ -22,9 +22,8 @@ public class UserService {
     public void updateUser(UserDTO user) {
         repository.updateUser(user);
     }
-    public void updateUserToken(UserDTO user) {
-        repository.updateUserToken(user);
-    }
+    public void updateTokenByUserId(long userId, String fcmToken) {repository.updateTokenByUserId(userId, fcmToken);};
+    public void updateUserToken(UserDTO user){repository.updateUserToken(user);}
     public UserDTO findUserByUserId(long userId) {return repository.findUserByUserId(userId);}
     public UserDTO findUserByUserSid(String userSid) {return repository.findUserByUserSid(userSid);}
     public boolean isExternalImage(long userId) {return repository.isExternalImage(userId);}

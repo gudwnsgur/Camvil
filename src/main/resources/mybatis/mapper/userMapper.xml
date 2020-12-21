@@ -51,13 +51,15 @@
     </insert>
 
     <update id="updateUser" parameterType="UserDTO">
-            UPDATE users SET user_name = '${userName}', user_image_path='${userImagePath}', external_path=false
+            UPDATE users SET user_name = '${userName}', user_image_path='${userImagePath}', external_image=#{externalImage}
             WHERE user_id = '${userId}';
+    </update>
+    <update id="updateTokenByUserId" parameterType="UserDTO">
+        UPDATE users SET access_token = '${fcmToken}' WHERE user_id = '${userId}';
     </update>
     <update id="updateUserToken" parameterType="UserDTO">
         UPDATE users SET access_token = '${fcmToken}' WHERE user_sid = '${userSid}';
     </update>
-
     <delete id="deleteUser" parameterType="UserDTO">
         CALL DeleteUser('${userId}');
     </delete>

@@ -13,7 +13,8 @@ import java.util.List;
 public interface BoardRepository {
     List<BoardsDTO> getBoards(String search, String campsiteCode, String order,
                               int limit, int offset);
-
+    List<BoardsDTO> getBoardsContainsCode(String search, String campsiteCode, String order,
+                              int limit, int offset);
     BoardDTO findLastBoardId();
     BoardDTO findBoardByBoardId(long boardId);
     List<BoardDTO> findBoardsByUserId(long userId);

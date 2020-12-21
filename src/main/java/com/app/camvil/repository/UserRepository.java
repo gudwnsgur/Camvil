@@ -21,5 +21,6 @@ public interface UserRepository {
     void insertUser(UserDTO user);
     void updateUser(UserDTO user);
     void updateUserToken(UserDTO user);
+    void updateTokenByUserId(long userId, String fcmToken);
     void deleteUser(long userId);
 }

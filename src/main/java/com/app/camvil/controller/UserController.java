@@ -38,9 +38,9 @@ public class UserController {
 
         SignUpRequestDTO signUpRequestDTO = gson.fromJson(request, SignUpRequestDTO.class);
 
-        if(signUpRequestDTO.getUserSid() == null || signUpRequestDTO.getUserSid().equals("") ||
-        signUpRequestDTO.getUserName() == null || signUpRequestDTO.getUserName().equals("") ||
-        signUpRequestDTO.getFcmToken() == null || signUpRequestDTO.getFcmToken().equals("")) {
+        if (signUpRequestDTO.getUserSid() == null || signUpRequestDTO.getUserSid().equals("") ||
+                signUpRequestDTO.getUserName() == null || signUpRequestDTO.getUserName().equals("") ||
+                signUpRequestDTO.getFcmToken() == null || signUpRequestDTO.getFcmToken().equals("")) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -49,14 +49,14 @@ public class UserController {
         UserDTO user = new UserDTO(signUpRequestDTO.getUserSid(), signUpRequestDTO.getUserEmail(),
                 signUpRequestDTO.getUserName(), signUpRequestDTO.getFcmToken());
 
-        if(userService.findUserByUserSid(user.getUserSid()) != null ) {
+        if (userService.findUserByUserSid(user.getUserSid()) != null) {
             response.put("responseCode", 409);
             response.put("responseMessage", "Conflict : already existed user");
             return gson.toJson(response);
         }
 
-        if(signUpRequestDTO.getImage() == null || signUpRequestDTO.getImage().equals("")) {
-            user.setUserImagePath(imageService.getBaseProfileImage());
+        if (signUpRequestDTO.getImage() == null || signUpRequestDTO.getImage().equals("")) {
+            user.setUserImagePath(null);
         } else {
             user.setUserImagePath(signUpRequestDTO.getImage());
         }
@@ -80,14 +80,14 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
 
         LoginRequestDTO loginRequestDTO = gson.fromJson(request, LoginRequestDTO.class);
-        if(loginRequestDTO.getUserSid() == null || loginRequestDTO.getUserSid().equals("") ||
-            loginRequestDTO.getFcmToken() == null || loginRequestDTO.getFcmToken().equals("")) {
+        if (loginRequestDTO.getUserSid() == null || loginRequestDTO.getUserSid().equals("") ||
+                loginRequestDTO.getFcmToken() == null || loginRequestDTO.getFcmToken().equals("")) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
         UserDTO user = userService.findUserByUserSid(loginRequestDTO.getUserSid());
-        if(user == null ) {
+        if (user == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -146,29 +146,50 @@ public class UserController {
             return gson.toJson(response);
         }
 
-        if(userUpdateRequestDTO.getUserName() == null || userUpdateRequestDTO.getUserName().equals("") ||
-           userUpdateRequestDTO.getFcmToken() == null || userUpdateRequestDTO.getFcmToken().equals("")) {
+        if (userUpdateRequestDTO.getUserName() == null || userUpdateRequestDTO.getUserName().equals("")) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
 
-        // BASE64 decoding & save image file
-        // delete original user profile image
-        if(userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage().equals("") ||
-        userUpdateRequestDTO.getUserImage().equals(imageService.getBaseProfileImage())) {
-            user.setUserImagePath(imageService.getBaseProfileImage());
-        } else {
-            String curImage = user.getUserImagePath();
-            if(!userService.isExternalImage(user.getUserId())) {
-                imageService.deleteImage(user.getUserImagePath());
+        // 안 바뀌면 path
+        // url -> null
+        // url -> real
+        // null -> real
+        // real -> real(수정)
+        // real -> null
+        boolean isExternalImage = false;
+        String updateImagePath = userUpdateRequestDTO.getUserImage();
+        if (!user.getUserImagePath().equals(updateImagePath)) {
+            // url or null =>
+            if(user.isExternalImage()) {
+                // => null
+                if(userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage() .equals("")) {
+                    updateImagePath = null;
+                    isExternalImage = true;
+                }
+                // => real
+                else {
+                    updateImagePath =  imagePath + "/" + imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
+                }
             }
-            String newImageName = imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
-            user.setUserImagePath(imagePath + "/" + newImageName);
+            // real =>
+            else {
+                imageService.deleteImage(user.getUserImagePath());
+                if(userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage() .equals("")) {
+                    updateImagePath = null;
+                    isExternalImage = true;
+                }
+                else {
+                    updateImagePath =  imagePath + "/" + imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
+                }
+            }
         }
-        user.setFcmToken(userUpdateRequestDTO.getFcmToken());
-        user.setUserName(userUpdateRequestDTO.getUserName());
 
+
+        user.setUserName(userUpdateRequestDTO.getUserName());
+        user.setUserImagePath(updateImagePath);
+        user.setExternalImage(isExternalImage);
 
         userService.updateUser(user);
 
@@ -201,7 +222,7 @@ public class UserController {
         }
 
         // delete user profile image
-        if(!user.getUserImagePath().equals(imageService.getBaseProfileImage())) {
+        if (!user.getUserImagePath().equals(imageService.getBaseProfileImage())) {
             imageService.deleteImage(user.getUserImagePath());
         }
         long userId = user.getUserId(); // user
@@ -243,4 +264,26 @@ public class UserController {
         response.put("responseMessage", "No Content");
         return gson.toJson(response);
     }
+
+    // update fcmToken
+    @RequestMapping(value = "/user/fcmToken", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    public String fcmToken(@RequestBody String request) {
+        Gson gson = new GsonBuilder().create();
+        Map<String, Object> response = new HashMap<>();
+
+        FcmTokenDTO fcmTokenDTO = gson.fromJson(request, FcmTokenDTO.class);
+        if (userService.findUserByUserId(fcmTokenDTO.getUserId()) == null) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+
+        userService.updateTokenByUserId(fcmTokenDTO.getUserId(), fcmTokenDTO.getFcmToken());
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", fcmTokenDTO);
+        return gson.toJson(response);
+    }
+
 }
