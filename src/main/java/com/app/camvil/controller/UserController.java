@@ -267,4 +267,32 @@ public class UserController {
         return gson.toJson(response);
     }
 
+    // user boards page
+    @RequestMapping(value = "/user/boards", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    public String userBoards(@RequestBody String request) {
+        Gson gson = new GsonBuilder().create();
+        Map<String, Object> response = new HashMap<>();
+
+
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", "");
+        return gson.toJson(response);
+    }
+
+    // user like board page
+    @RequestMapping(value = "/user/likeBoards", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    public String userLikeBoards(@RequestBody String request) {
+        Gson gson = new GsonBuilder().create();
+        Map<String, Object> response = new HashMap<>();
+
+
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", "");
+        return gson.toJson(response);
+    }
+
 }

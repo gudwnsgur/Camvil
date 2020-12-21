@@ -7,7 +7,7 @@ public class CommentDetailResponseDTO {
     private String userImagePath;
     private String commentContent;
     private String postDate;
-
+    private String updateDate;
     public CommentDetailResponseDTO() {
 
     }
@@ -34,5 +34,9 @@ public class CommentDetailResponseDTO {
 
     public void setCommentId(long commentId) {
         this.commentId = commentId;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
     }
 }

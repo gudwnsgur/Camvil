@@ -36,7 +36,7 @@
     <select id="getCommentsByBoardId" resultType="com.app.camvil.dto.responsedto.CommentDetailResponseDTO">
         SELECT u.user_id as userId, cm.comment_id as commentId,
         u.user_name as userName, u.user_image_path as userImagePath,
-        cm.comment_content as commentContent, cm.post_date as postDate
+        cm.comment_content as commentContent, cm.post_date as postDate, cm.update_date as updateDate
         FROM users as u, comments as cm
         WHERE cm.board_id = '${boardId}' AND u.user_id = cm.user_id
         GROUP BY cm.comment_id
@@ -45,7 +45,7 @@
     <select id="getTwoCommentsByBoardId" resultType="com.app.camvil.dto.responsedto.CommentDetailResponseDTO">
         SELECT u.user_id as userId, cm.comment_id as commentId,
         u.user_name as userName, u.user_image_path as userImagePath,
-        cm.comment_content as commentContent, cm.post_date as postDate
+        cm.comment_content as commentContent, cm.post_date as postDate, cm.update_date as updateDate
         FROM users as u, comments as cm
         WHERE cm.board_id = '${boardId}' AND u.user_id = cm.user_id
         GROUP BY cm.comment_id
