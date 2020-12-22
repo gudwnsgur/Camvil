@@ -2,9 +2,7 @@ package com.app.camvil.controller;
 
 import com.app.camvil.dto.*;
 import com.app.camvil.dto.requestdto.*;
-import com.app.camvil.dto.responsedto.LoginResponseDTO;
-import com.app.camvil.dto.responsedto.MyPageResponseDTO;
-import com.app.camvil.dto.responsedto.SignUpResponseDTO;
+import com.app.camvil.dto.responsedto.*;
 import com.app.camvil.service.*;
 
 import com.google.gson.Gson;
@@ -13,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -272,12 +271,38 @@ public class UserController {
     public String userBoards(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
+        Map<String, Object> responseBody = new HashMap<>();
 
+        UserIdRequestDTO userIdRequestDTO = gson.fromJson(request, UserIdRequestDTO.class);
+
+        // if user id not found
+        if(userService.findUserByUserId(userIdRequestDTO.getUserId()) == null) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+        UserDTO user = userService.findUserByUserId(userIdRequestDTO.getUserId());
+        long total = boardService.getTotalBoardCntWithUserId(user.getUserId());
+
+        List<BoardsDTO> boardsDTOS = boardService.getBoardsByUserId(user.getUserId());
+        List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
+
+        for(int i=0; i<boardsDTOS.size(); i++) {
+            long curBoardId = boardsDTOS.get(i).getBoardId();
+            List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
+            List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
+
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            boardsResponseDTO.add(curBoard);
+        }
+
+        responseBody.put("items", boardsResponseDTO);
+        responseBody.put("total", total);
 
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
-        response.put("responseBody", "");
+        response.put("responseBody", responseBody);
         return gson.toJson(response);
     }
 
@@ -286,13 +311,127 @@ public class UserController {
     public String userLikeBoards(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
+        Map<String, Object> responseBody = new HashMap<>();
 
+        UserIdRequestDTO userIdRequestDTO = gson.fromJson(request, UserIdRequestDTO.class);
+
+        // if user id not found
+        if(userService.findUserByUserId(userIdRequestDTO.getUserId()) == null) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+        UserDTO user = userService.findUserByUserId(userIdRequestDTO.getUserId());
+        long total = boardService.getTotalLikeBoardCntWithUserId(user.getUserId());
+
+        List<BoardsDTO> boardsDTOS = boardService.getLikeBoardsByUserId(user.getUserId());
+        List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
+
+        for(int i=0; i<boardsDTOS.size(); i++) {
+            long curBoardId = boardsDTOS.get(i).getBoardId();
+            List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
+            List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
+
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            boardsResponseDTO.add(curBoard);
+        }
+
+        responseBody.put("items", boardsResponseDTO);
+        responseBody.put("total", total);
 
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
-        response.put("responseBody", "");
+        response.put("responseBody", responseBody);
         return gson.toJson(response);
     }
 
+
+    // user boards page with paging
+    @RequestMapping(value = "/user/boards/paging", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    public String userBoardsPaging(@RequestBody String request) {
+        Gson gson = new GsonBuilder().create();
+        Map<String, Object> response = new HashMap<>();
+        Map<String, Object> responseBody = new HashMap<>();
+        UserPagingDTO userPagingDTO = gson.fromJson(request, UserPagingDTO.class);
+
+        // if user id not found
+        if(userService.findUserByUserId(userPagingDTO.getUserId()) == null) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+        UserDTO user = userService.findUserByUserId(userPagingDTO.getUserId());
+        userPagingDTO.setPageNumber();
+        long total = boardService.getTotalBoardCntWithUserId(user.getUserId());
+
+        List<BoardsDTO> boardsDTOS = boardService.getBoardsByUserIdWithPaging(user.getUserId(),
+                userPagingDTO.getPageSize(),
+                userPagingDTO.getPageSize()*(userPagingDTO.getPageNumber()-1));
+        List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<BoardsResponseDTO>();
+
+        for(int i=0; i<boardsDTOS.size(); i++) {
+            long curBoardId = boardsDTOS.get(i).getBoardId();
+            List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
+            List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
+
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            boardsResponseDTO.add(curBoard);
+        }
+
+        responseBody.put("items", boardsResponseDTO);
+        responseBody.put("pageNumber", userPagingDTO.getPageNumber());
+        responseBody.put("pageSize", userPagingDTO.getPageSize());
+        responseBody.put("total", total);
+
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", responseBody);
+        return gson.toJson(response);
+    }
+
+    // user like board page with paging
+    @RequestMapping(value = "/user/likeBoards/paging", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    public String userLikeBoardsPaging(@RequestBody String request) {
+        Gson gson = new GsonBuilder().create();
+        Map<String, Object> response = new HashMap<>();
+        Map<String, Object> responseBody = new HashMap<>();
+        UserPagingDTO userPagingDTO = gson.fromJson(request, UserPagingDTO.class);
+
+        // if user id not found
+        if(userService.findUserByUserId(userPagingDTO.getUserId()) == null) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+        UserDTO user = userService.findUserByUserId(userPagingDTO.getUserId());
+        userPagingDTO.setPageNumber();
+        long total = boardService.getTotalLikeBoardCntWithUserId(user.getUserId());
+
+        List<BoardsDTO> boardsDTOS = boardService.getLikeBoardsByUserIdWithPaging(user.getUserId(),
+                userPagingDTO.getPageSize(),
+                userPagingDTO.getPageSize()*(userPagingDTO.getPageNumber()-1));
+        List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
+
+        for(int i=0; i<boardsDTOS.size(); i++) {
+            long curBoardId = boardsDTOS.get(i).getBoardId();
+            List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
+            List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
+
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            boardsResponseDTO.add(curBoard);
+        }
+
+        responseBody.put("items", boardsResponseDTO);
+        responseBody.put("pageNumber", userPagingDTO.getPageNumber());
+        responseBody.put("pageSize", userPagingDTO.getPageSize());
+        responseBody.put("total", total);
+
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", responseBody);
+        return gson.toJson(response);
+    }
 }

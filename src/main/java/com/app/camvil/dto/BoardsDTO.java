@@ -15,6 +15,7 @@ public class BoardsDTO {
     private double mapY;
     private String boardContent;
     private String postDate;
+    private String updateDate;
     private long commentCnt;
     private long likeCnt;
 
@@ -113,5 +114,13 @@ public class BoardsDTO {
 
     public void setLikeCnt(long likeCnt) {
         this.likeCnt = likeCnt;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
     }
 }

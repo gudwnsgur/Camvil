@@ -22,6 +22,19 @@ public class BoardService {
             return repository.getBoardsContainsCode(search, campsiteCode, order, limit, offset);
     }
 
+    public List<BoardsDTO> getBoardsByUserId(long userId) {
+        return repository.getBoardsByUserId(userId);
+    }
+    public List<BoardsDTO> getBoardsByUserIdWithPaging(long userId, int limit, int offset) {
+        return repository.getBoardsByUserIdWithPaging(userId, limit, offset);
+    }
+    public List<BoardsDTO> getLikeBoardsByUserId(long userId) {
+        return repository.getLikeBoardsByUserId(userId);
+    }
+    public List<BoardsDTO> getLikeBoardsByUserIdWithPaging(long userId, int limit, int offset) {
+        return repository.getLikeBoardsByUserIdWithPaging(userId, limit, offset);
+    }
+
     public BoardDTO findLastBoardId() {return repository.findLastBoardId();}
     public BoardDTO findBoardByBoardId(long boardId) {
         return repository.findBoardByBoardId(boardId);
@@ -46,6 +59,13 @@ public class BoardService {
     public long getTotalBoardCnt(String search, String campsiteCode, String order) {
         return repository.getTotalBoardCnt(search, campsiteCode, order);
     }
+    public long getTotalBoardCntWithUserId(long userId) {
+        return repository.getTotalBoardCntWithUserId(userId);
+    }
+    public long getTotalLikeBoardCntWithUserId(long userId) {
+        return repository.getTotalLikeBoardCntWithUserId(userId);
+    }
+
 
     public void insertBoard(BoardDTO boardDTO) {
         repository.insertBoard(boardDTO);

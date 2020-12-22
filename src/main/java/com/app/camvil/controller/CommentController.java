@@ -188,11 +188,11 @@ public class CommentController {
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("boardId", board.getBoardId());
-        responseBody.put("commentCnt", boardService.getCommentCountByBoardId(board.getBoardId()));
+        responseBody.put("total", boardService.getCommentCountByBoardId(board.getBoardId()));
 
         List<CommentDetailResponseDTO> commentDetailResponseDTOS =
                 commentService.getCommentsByBoardId(board.getBoardId());
-        responseBody.put("commentDetail", commentDetailResponseDTOS);
+        responseBody.put("items", commentDetailResponseDTOS);
 
         // response
         response.put("responseCode", 200);

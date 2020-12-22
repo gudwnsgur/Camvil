@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 
 @RestController
@@ -74,7 +73,7 @@ public class BoardController {
             boardsResponseDTO.add(curBoard);
         }
 
-        responseBody.put("boards", boardsResponseDTO);
+        responseBody.put("items", boardsResponseDTO);
         responseBody.put("pageNumber", boardsRequestDTO.getPageNumber());
         responseBody.put("pageSize", boardsRequestDTO.getPageSize());
         responseBody.put("total", total);

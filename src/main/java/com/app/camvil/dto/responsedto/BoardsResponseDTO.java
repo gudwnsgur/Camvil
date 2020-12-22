@@ -18,6 +18,8 @@ public class BoardsResponseDTO {
     private List<ImageListDTO> images;
     private List<CommentDetailResponseDTO> comments;
     private String postDate;
+    private String updateDate;
+
     private long commentCnt;
     private long likeCnt;
 
@@ -38,6 +40,7 @@ public class BoardsResponseDTO {
         this.images = images;
         this.comments = comments;
         this.postDate = boardsDTO.getPostDate();
+        this.updateDate = boardsDTO.getUpdateDate();
         this.commentCnt = boardsDTO.getCommentCnt();
         this.likeCnt = boardsDTO.getLikeCnt();
     }

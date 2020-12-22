@@ -15,6 +15,12 @@ public interface BoardRepository {
                               int limit, int offset);
     List<BoardsDTO> getBoardsContainsCode(String search, String campsiteCode, String order,
                               int limit, int offset);
+
+    List<BoardsDTO> getBoardsByUserId(long userId);
+    List<BoardsDTO> getBoardsByUserIdWithPaging(long userId, int limit, int offset);
+    List<BoardsDTO> getLikeBoardsByUserId(long userId);
+    List<BoardsDTO> getLikeBoardsByUserIdWithPaging(long userId, int limit, int offset);
+
     BoardDTO findLastBoardId();
     BoardDTO findBoardByBoardId(long boardId);
     List<BoardDTO> findBoardsByUserId(long userId);
@@ -25,6 +31,8 @@ public interface BoardRepository {
     List<CampsiteCountResponseDTO> getCampsiteCount();
     long getCommentCountByBoardId(long boardId);
     long getTotalBoardCnt(String search, String campsiteCode, String order);
+    long getTotalBoardCntWithUserId(long userId);
+    long getTotalLikeBoardCntWithUserId(long userId);
     void insertBoard(BoardDTO boardDTO);
     void updateBoard(BoardDTO boardDTO);
     void increaseLike(long boardId);

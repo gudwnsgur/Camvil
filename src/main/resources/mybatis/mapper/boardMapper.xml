@@ -20,33 +20,90 @@
 		b.user_id as userId, u.user_image_path as userImagePath, u.user_name as userName,
 		cs.campsite_code as campsiteCode, cs.campsite_name as campsiteName,
         cs.mapX as mapX, cs.mapY as mapY, b.board_content as boardContent,
-        b.post_date as postDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
+        b.post_date as postDate, b.update_date as updateDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
         FROM boards as b, users as u, campsites as cs
         WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
         AND b.board_content LIKE concat('%', '${search}' ,'%')
         GROUP BY b.board_id
-        ORDER BY ${order}
-        desc LIMIT #{limit} OFFSET #{offset};
+        ORDER BY ${order} desc LIMIT #{limit} OFFSET #{offset};
     </select>
 
+    <select id="getBoardsByUserId" resultType="com.app.camvil.dto.BoardsDTO">
+        SELECT b.board_id as boardId,
+		b.user_id as userId, u.user_image_path as userImagePath, u.user_name as userName,
+		cs.campsite_code as campsiteCode, cs.campsite_name as campsiteName,
+        cs.mapX as mapX, cs.mapY as mapY, b.board_content as boardContent,
+        b.post_date as postDate, b.update_date as updateDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
+        FROM boards as b, users as u, campsites as cs
+        WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
+        AND b.user_id = '${userId}'
+        GROUP BY b.board_id
+        ORDER BY post_date desc
+    </select>
+    <select id="getBoardsByUserIdWithPaging" resultType="com.app.camvil.dto.BoardsDTO">
+        SELECT b.board_id as boardId,
+		b.user_id as userId, u.user_image_path as userImagePath, u.user_name as userName,
+		cs.campsite_code as campsiteCode, cs.campsite_name as campsiteName,
+        cs.mapX as mapX, cs.mapY as mapY, b.board_content as boardContent,
+        b.post_date as postDate, b.update_date as updateDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
+        FROM boards as b, users as u, campsites as cs
+        WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
+        AND b.user_id = '${userId}'
+        GROUP BY b.board_id
+        ORDER BY b.post_date desc LIMIT #{limit} OFFSET #{offset};
+    </select>
+
+    <select id="getLikeBoardsByUserId" resultType="com.app.camvil.dto.BoardsDTO">
+        SELECT b.board_id as boardId,
+		b.user_id as userId, u.user_image_path as userImagePath, u.user_name as userName,
+		cs.campsite_code as campsiteCode, cs.campsite_name as campsiteName,
+        cs.mapX as mapX, cs.mapY as mapY, b.board_content as boardContent,
+        b.post_date as postDate, b.update_date as updateDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
+        FROM boards as b, users as u, campsites as cs
+        WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
+        AND b.board_id IN ( SELECT board_id FROM likes WHERE user_id = '${userId}' AND like_ = true )
+        GROUP BY b.board_id
+        ORDER BY post_date desc
+    </select>
+    <select id="getLikeBoardsByUserIdWithPaging" resultType="com.app.camvil.dto.BoardsDTO">
+        SELECT b.board_id as boardId,
+		b.user_id as userId, u.user_image_path as userImagePath, u.user_name as userName,
+		cs.campsite_code as campsiteCode, cs.campsite_name as campsiteName,
+        cs.mapX as mapX, cs.mapY as mapY, b.board_content as boardContent,
+        b.post_date as postDate, b.update_date as updateDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
+        FROM boards as b, users as u, campsites as cs
+        WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
+        AND b.board_id IN ( SELECT board_id FROM likes WHERE user_id = '${userId}' AND like_ = true )
+        GROUP BY b.board_id
+        ORDER BY b.post_date desc LIMIT #{limit} OFFSET #{offset};
+    </select>
     <select id="getBoardsContainsCode" resultType="com.app.camvil.dto.BoardsDTO">
         SELECT b.board_id as boardId,
 		b.user_id as userId, u.user_image_path as userImagePath, u.user_name as userName,
 		cs.campsite_code as campsiteCode, cs.campsite_name as campsiteName,
         cs.mapX as mapX, cs.mapY as mapY, b.board_content as boardContent,
-        b.post_date as postDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
+        b.post_date as postDate, b.update_date as updateDate, b.comment_cnt as commentCnt, b.like_cnt as likeCnt
         FROM boards as b, users as u, campsites as cs
         WHERE b.user_id = u.user_id AND b.campsite_code = cs.campsite_code
         AND b.board_content LIKE concat('%', '${search}' ,'%') AND cs.campsite_code = '${campsiteCode}'
         GROUP BY b.board_id
-        ORDER BY ${order}
-        desc LIMIT #{limit} OFFSET #{offset};
+        ORDER BY ${order} desc LIMIT #{limit} OFFSET #{offset};
     </select>
 
     <select id="getTotalBoardCnt" resultType="long">
         SELECT count(*) as cnt
         FROM boards
         WHERE board_content LIKE concat('%', '${search}', '%') AND campsite_code LIKE concat('%', '${campsiteCode}' ,'%');
+    </select>
+    <select id="getTotalBoardCntWithUserId" resultType="long">
+        SELECT count(*) as cnt
+        FROM boards
+        WHERE user_id = '${userId}';
+    </select>
+    <select id="getTotalLikeBoardCntWithUserId" resultType="long">
+        SELECT count(*) as cnt
+        FROM boards
+        WHERE board_id IN ( SELECT board_id FROM likes WHERE user_id = '${userId}' AND like_=true)
     </select>
 
     <select id="findLastBoardId" resultMap="boardMap">
@@ -73,10 +130,13 @@
         SELECT comment_cnt FROM boards WHERE board_id = '${board_id}';
     </select>
 
+
+
     <insert id="insertBoard" parameterType="BoardDTO">
         INSERT INTO boards(user_id, campsite_code, board_content, post_date)
         VALUES ('${userId}', '${campsiteCode}', '${boardContent}', DATE_ADD(now(), INTERVAL 9 HOUR));
     </insert>
+
 
     <update id="updateBoard" parameterType="BoardDTO">
         UPDATE boards
@@ -98,6 +158,7 @@
     <update id="decreaseCommentsByBoardId" parameterType="com.app.camvil.dto.CommentCountDTO">
         UPDATE boards SET comment_cnt = comment_cnt - '${commentCnt}' WHERE board_id = '${boardId}';
     </update>
+
 
     <delete id="deleteBoard" parameterType="BoardDTO">
         DELETE FROM boards WHERE board_id = '${boardId}';
