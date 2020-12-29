@@ -4,7 +4,7 @@ public class SignUpRequestDTO {
     private String userSid;
     private String userEmail;
     private String userName;
-    private String image;
+    private String userImagePath;
     private String fcmToken;
 
     public String getUserSid() {
@@ -31,19 +31,19 @@ public class SignUpRequestDTO {
         this.userName = userName;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
     public String getFcmToken() {
         return fcmToken;
     }
 
     public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
+    }
+
+    public String getUserImagePath() {
+        return userImagePath;
+    }
+
+    public void setUserImagePath(String userImagePath) {
+        this.userImagePath = userImagePath;
     }
 }

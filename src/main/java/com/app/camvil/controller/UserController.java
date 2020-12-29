@@ -54,10 +54,10 @@ public class UserController {
             return gson.toJson(response);
         }
 
-        if (signUpRequestDTO.getImage() == null || signUpRequestDTO.getImage().equals("")) {
+        if (signUpRequestDTO.getUserImagePath() == null || signUpRequestDTO.getUserImagePath().equals("")) {
             user.setUserImagePath(null);
         } else {
-            user.setUserImagePath(signUpRequestDTO.getImage());
+            user.setUserImagePath(signUpRequestDTO.getUserImagePath());
         }
         userService.insertUser(user);
 
