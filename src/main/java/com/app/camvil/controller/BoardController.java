@@ -40,7 +40,6 @@ public class BoardController {
         BoardsRequestDTO boardsRequestDTO = gson.fromJson(request, BoardsRequestDTO.class);
         boardsRequestDTO.setPageNumber();
 
-
         String order = (boardsRequestDTO.getOrder() == null ||
                 boardsRequestDTO.getOrder().equals("") ||
                 boardsRequestDTO.getOrder().equals("post_date")) ? "post_date" : "like_cnt";
@@ -61,15 +60,14 @@ public class BoardController {
                 boardsRequestDTO.getPageSize()*(boardsRequestDTO.getPageNumber()-1));
 
 
-        List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<BoardsResponseDTO>();
+        List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
 
-        Map<String, Object> boardMap = new HashMap<>();
-        for(int i=0; i<boardsDTOS.size(); i++) {
-            long curBoardId = boardsDTOS.get(i).getBoardId();
+        for (BoardsDTO boardsDTO : boardsDTOS) {
+            long curBoardId = boardsDTO.getBoardId();
             List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
             List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
 
-            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
         }
 
@@ -86,10 +84,6 @@ public class BoardController {
     }
 
     // 게시물 생성
-    /*
-     BoardCreateRequestDTO : userId, campsiteCode, campsiteName, mapX, mapY, boardContent, images(List)
-     BoardCreateResponseDTO : boardContent, campsiteCode, imagePath(list)
-     */
     @RequestMapping(value = "/board/create", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String boardCreate(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
@@ -114,7 +108,7 @@ public class BoardController {
         }
 
 
-        ArrayList<String> imageNames = new ArrayList<String>();
+        ArrayList<String> imageNames = new ArrayList<>();
         if( boardCreateRequestDTO.getImages() != null
                 && !boardCreateRequestDTO.getImages().isEmpty()) {
             // decoding images
@@ -129,16 +123,13 @@ public class BoardController {
         );
         boardService.insertBoard(board);
 
-
         long curBoardId = boardService.findLastBoardId().getBoardId();
         UserDTO user = userService.findUserByUserId(boardCreateRequestDTO.getUserId());
 
         if(imageNames != null && !imageNames.isEmpty()) {
             // insert images in images table
-            for (int i = 0; i < imageNames.size(); i++) {
-                ImageDTO image = new ImageDTO(curBoardId,
-                        imageNames.get(i),
-                        "/images");
+            for (String imageName : imageNames) {
+                ImageDTO image = new ImageDTO(curBoardId, imageName, "/images");
                 imageService.insertImages(image);
             }
         }
@@ -165,10 +156,6 @@ public class BoardController {
     }
 
     // 게시물 수정
-    /*
-    BoardUpdateRequestDTO : userId, boardId, campsiteCode, campsiteName, mapX, mapY, boardContent
-    BoardUpdateResponseDTO : boardContent, campsiteCode, firstImagePath
-     */
     @RequestMapping(value = "/board/update", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String boardUpdate(@RequestBody String request){
         Gson gson = new GsonBuilder().create();
@@ -227,10 +214,6 @@ public class BoardController {
     }
 
     // 게시물 삭제
-    /*
-    BoardDeleteRequestDTO : boardId, userId
-    BoardDeleteResponseDTO : x
-     */
     @RequestMapping(value = "/board/delete", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String boardDelete(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
@@ -253,18 +236,15 @@ public class BoardController {
             response.put("responseMessage", "Unauthorized");
             return gson.toJson(response);
         }
+
         // 사진 파일 찾아서 물리적 삭제 : findImagesByBoardId
         List<ImageDTO> images = imageService.findImagesByBoardId(boardDeleteRequestDTO.getBoardId());
-        for(int i=0; i<images.size(); i++) {
-            String imagePath = images.get(i).getImagePath();
-            String imageName = images.get(i).getImageName();
-            imageService.deleteImage(imagePath, imageName);
+        for (ImageDTO image : images) {
+            imageService.toUnusableByImageId(image.getImageId());
         }
 
-        imageService.deleteImagesByBoardId(boardDeleteRequestDTO.getBoardId());
-        commentService.deleteCommentsByBoardId(boardDeleteRequestDTO.getBoardId());
-        likeService.deleteLikesByBoardId(boardDeleteRequestDTO.getBoardId());
-        boardService.deleteBoard(boardDeleteRequestDTO.getBoardId());
+        commentService.toUnusableByBoardId(boardDeleteRequestDTO.getBoardId());
+        boardService.toUnusableByBoardId(boardDeleteRequestDTO.getBoardId());
 
         response.put("responseCode", 204);
         response.put("responseMessage", "No Content");
@@ -273,10 +253,6 @@ public class BoardController {
     }
 
     // 캠핑장 코드별 개수
-    /*
-    Request : X
-    campsiteCountResponseDTO : List<campsiteCode, boardCnt>
-     */
     @RequestMapping(value = "/campsite/count", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String campsiteCount() {
         Gson gson = new GsonBuilder().create();
@@ -286,17 +262,12 @@ public class BoardController {
 
         ArrayList<CampsiteCountResponseDTO> campsiteCountResponseDTOS1 = new ArrayList<>();
 
-        for(int i=0; i<campsiteCountResponseDTOS.size(); i++) {
-            if(!campsiteCountResponseDTOS.get(i).getCampsiteCode().equals("")) {
-                campsiteCountResponseDTOS1.add(campsiteCountResponseDTOS.get(i));
+        for (CampsiteCountResponseDTO campsiteCountResponseDTO : campsiteCountResponseDTOS) {
+            if (!campsiteCountResponseDTO.getCampsiteCode().equals("")) {
+                campsiteCountResponseDTOS1.add(campsiteCountResponseDTO);
             }
         }
 
-        if(campsiteCountResponseDTOS1.size() == 0) {
-            response.put("responseCode", 204);
-            response.put("responseMessage", "No Content");
-            return gson.toJson(response);
-        }
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", campsiteCountResponseDTOS1);

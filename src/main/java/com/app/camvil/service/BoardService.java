@@ -57,7 +57,10 @@ public class BoardService {
         return repository.getCommentCountByBoardId(boardId);
     }
     public long getTotalBoardCnt(String search, String campsiteCode, String order) {
-        return repository.getTotalBoardCnt(search, campsiteCode, order);
+        if(campsiteCode == null || campsiteCode.equals(""))
+            return repository.getTotalBoardCnt(search, campsiteCode, order);
+        else
+            return repository.getTotalBoardCntContainsCode(search, campsiteCode, order);
     }
     public long getTotalBoardCntWithUserId(long userId) {
         return repository.getTotalBoardCntWithUserId(userId);
@@ -93,5 +96,8 @@ public class BoardService {
         repository.deleteBoard(boardId);
     }
 
+    public boolean isUsable(long boardId) {return repository.isUsable(boardId);}
+    public void toUnusableByBoardId(long boardId) {repository.toUnusableByBoardId(boardId);}
+    public void toUnusableByUserId(long userId) {repository.toUnusableByUserId(userId);}
 
 }

@@ -152,16 +152,10 @@ public class UserController {
         boolean isExternalImage = false;
         String updateImagePath = userUpdateRequestDTO.getUserImage();
         if (!user.getUserImagePath().equals(updateImagePath)) {
-            // url or null =>
-            if (!user.isExternalImage()) {
-                imageService.deleteImage(user.getUserImagePath());
-            }
-            // => null
             if (userUpdateRequestDTO.getUserImage() == null || userUpdateRequestDTO.getUserImage().equals("")) {
                 updateImagePath = null;
                 isExternalImage = true;
             }
-            // => real
             else {
                 updateImagePath = imagePath + "/" + imageService.getUserImageName(userUpdateRequestDTO.getUserImage());
             }
@@ -180,10 +174,6 @@ public class UserController {
 }
 
     // Delete user
-     /*
-    UserDeleteRequestDTO : userId
-    response : X
-    */
     @RequestMapping(value = "/user/delete", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String userDelete(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
@@ -200,44 +190,37 @@ public class UserController {
             return gson.toJson(response);
         }
 
-        // delete user profile image
-        if (!user.isExternalImage()) {
-            imageService.deleteImage(user.getUserImagePath());
-        }
-
         long userId = user.getUserId(); // user
         List<BoardDTO> boards = boardService.findBoardsByUserId(user.getUserId()); // boards
 
         // delete boards
-        for (int i = 0; i < boards.size(); i++) {
-            long boardId = boards.get(i).getBoardId();
+        for (BoardDTO board : boards) {
+            long boardId = board.getBoardId();
 
             // 사진 파일 찾아서 물리적 삭제 : findImagesByBoardId
             List<ImageDTO> images = imageService.findImagesByBoardId(boardId);
-            for (int j = 0; j < images.size(); j++) {
-                String imagePaths = images.get(j).getImagePath();
-                String imageName = images.get(j).getImageName();
-                imageService.deleteImage(imagePaths, imageName);
+            for (ImageDTO image : images) {
+                imageService.toUnusableByImageId(image.getImageId());
             }
-            imageService.deleteImagesByBoardId(boardId);
-            commentService.deleteCommentsByBoardId(boardId);
-            likeService.deleteLikesByBoardId(boardId);
-            boardService.deleteBoard(boardId);
+            commentService.toUnusableByBoardId(boardId);
+            boardService.toUnusableByBoardId(boardId);
         }
 
         // decrease likes
         List<LikeDTO> likes = likeService.findLikeBoardsByUserId(user.getUserId());
-        for (int i = 0; i < likes.size(); i++) {
-            boardService.decreaseLike(likes.get(i).getBoardId());
+        for (LikeDTO like : likes) {
+            if(boardService.findBoardByBoardId(like.getBoardId()) != null)
+                boardService.decreaseLike(like.getBoardId());
         }
         // decrease comments
         List<CommentCountDTO> comments = commentService.countCommentsByUserId(user.getUserId());
-        for (int i = 0; i < comments.size(); i++) {
-            boardService.decreaseCommentsByBoardId(comments.get(i).getCommentCnt(), comments.get(i).getBoardId());
+        for (CommentCountDTO comment : comments) {
+            if(boardService.findBoardByBoardId(comment.getBoardId()) != null)
+                boardService.decreaseCommentsByBoardId(comment.getCommentCnt(), comment.getBoardId());
         }
 
         // delete user
-        userService.deleteUser(userId);
+        userService.toUnusableByUserId(userId);
 
         // response
         response.put("responseCode", 204);
@@ -287,12 +270,12 @@ public class UserController {
         List<BoardsDTO> boardsDTOS = boardService.getBoardsByUserId(user.getUserId());
         List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
 
-        for(int i=0; i<boardsDTOS.size(); i++) {
-            long curBoardId = boardsDTOS.get(i).getBoardId();
+        for (BoardsDTO boardsDTO : boardsDTOS) {
+            long curBoardId = boardsDTO.getBoardId();
             List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
             List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
 
-            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
         }
 
@@ -327,12 +310,12 @@ public class UserController {
         List<BoardsDTO> boardsDTOS = boardService.getLikeBoardsByUserId(user.getUserId());
         List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
 
-        for(int i=0; i<boardsDTOS.size(); i++) {
-            long curBoardId = boardsDTOS.get(i).getBoardId();
+        for (BoardsDTO boardsDTO : boardsDTOS) {
+            long curBoardId = boardsDTO.getBoardId();
             List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
             List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
 
-            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
         }
 
@@ -370,12 +353,12 @@ public class UserController {
                 userPagingDTO.getPageSize()*(userPagingDTO.getPageNumber()-1));
         List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<BoardsResponseDTO>();
 
-        for(int i=0; i<boardsDTOS.size(); i++) {
-            long curBoardId = boardsDTOS.get(i).getBoardId();
+        for (BoardsDTO boardsDTO : boardsDTOS) {
+            long curBoardId = boardsDTO.getBoardId();
             List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
             List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
 
-            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
         }
 
@@ -414,12 +397,12 @@ public class UserController {
                 userPagingDTO.getPageSize()*(userPagingDTO.getPageNumber()-1));
         List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
 
-        for(int i=0; i<boardsDTOS.size(); i++) {
-            long curBoardId = boardsDTOS.get(i).getBoardId();
+        for (BoardsDTO boardsDTO : boardsDTOS) {
+            long curBoardId = boardsDTO.getBoardId();
             List<ImageListDTO> images = imageService.findImageListByBoardId(curBoardId);
             List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(curBoardId);
 
-            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTOS.get(i), images, comments);
+            BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
         }
 

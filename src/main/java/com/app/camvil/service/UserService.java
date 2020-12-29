@@ -36,4 +36,7 @@ public class UserService {
     public SearchDTO findSearchBySearchContent(String searchContent){return repository.findSearchBySearchContent(searchContent);}
     public void insertSearchContent(String searchContent) {repository.insertSearchContent(searchContent);}
     public void increaseSearchContent(String searchContent) {repository.increaseSearchContent(searchContent);}
+
+    public boolean isUsable(long userId) {return repository.isUsable(userId);}
+    public void toUnusableByUserId(long userId) {repository.toUnusableByUserId(userId);}
 }

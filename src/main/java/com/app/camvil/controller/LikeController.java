@@ -24,10 +24,6 @@ public class LikeController {
     UserService userService;
 
     // 좋아요 or 좋아요 취소
-    /*
-    LikeRequestDTO : user_id, board_id, like_("true" or "false")
-    LikeResponseDTO : NULL
-    */
     @RequestMapping(value = "/like", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
     public String like(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
@@ -59,7 +55,6 @@ public class LikeController {
             boardService.increaseLike(like.getBoardId());
             likeService.updateUnlikeToLike(like);
         }
-
         response.put("responseCode", 204);
         response.put("responseMessage", "No Content");
         return gson.toJson(response);

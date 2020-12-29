@@ -28,4 +28,9 @@ public interface CommentRepository {
     void deleteCommentsByBoardId(long boardId);
     void deleteCommentsByUserId(long userId);
 
+    boolean isUsable(long boardId);
+    void toUnusableByCommentId(long commentId);
+    void toUnusableByBoardId(long boardId);
+    void toUnusableByUserId(long userId);
+
 }

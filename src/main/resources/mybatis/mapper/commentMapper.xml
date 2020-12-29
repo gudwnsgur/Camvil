@@ -15,22 +15,22 @@
 
     </resultMap>
     <select id="findLastCommentId" resultMap="commentMap">
-        SELECT * FROM comments ORDER BY post_date DESC LIMIT 1;
+        SELECT * FROM comments WHERE usable=true ORDER BY post_date DESC LIMIT 1;
     </select>
 
     <select id="findCommentByCommentId" resultMap="commentMap">
-        SELECT * FROM comments WHERE comment_id = '${commentId}';
+        SELECT * FROM comments WHERE comment_id = '${commentId}' AND usable=true;
     </select>
     <select id="findCommentsByBoardId" resultMap="commentMap">
-        SELECT * FROM comments WHERE board_id = '${boardId}';
+        SELECT * FROM comments WHERE board_id = '${boardId}' AND usable=true;
     </select>
     <select id="findCommentsByUserId" resultMap="commentMap">
-        SELECT * FROM comments WHERE user_id = '${userId}';
+        SELECT * FROM comments WHERE user_id = '${userId}' AND usable=true ;
     </select>
     <select id="countCommentsByUserId" resultType="com.app.camvil.dto.CommentCountDTO">
         SELECT b.board_id as boardId, count(*) as commentCnt
         FROM comments as cm, boards as b
-        WHERE cm.board_id = b.board_id AND cm.user_id = '${userId}'
+        WHERE cm.board_id = b.board_id AND cm.user_id = '${userId}'  AND b.usable=true AND cm.usable=true
         GROUP BY b.board_id;
     </select>
     <select id="getCommentsByBoardId" resultType="com.app.camvil.dto.responsedto.CommentDetailResponseDTO">
@@ -39,6 +39,7 @@
         cm.comment_content as commentContent, cm.post_date as postDate, cm.update_date as updateDate
         FROM users as u, comments as cm
         WHERE cm.board_id = '${boardId}' AND u.user_id = cm.user_id
+        AND cm.usable=true AND u.usable=true
         GROUP BY cm.comment_id
         ORDER BY cm.post_date ASC;
     </select>
@@ -48,12 +49,13 @@
         cm.comment_content as commentContent, cm.post_date as postDate, cm.update_date as updateDate
         FROM users as u, comments as cm
         WHERE cm.board_id = '${boardId}' AND u.user_id = cm.user_id
+        AND u.usable=true AND cm.usable=true
         GROUP BY cm.comment_id
         ORDER BY cm.post_date desc LIMIT 2;
     </select>
     <insert id="insertComment" parameterType="CommentDTO">
-        INSERT INTO comments(comment_content, user_id, board_id, post_date)
-        VALUES ('${commentContent}', '${userId}', '${boardId}', DATE_ADD(now(), INTERVAL 9 HOUR));
+        INSERT INTO comments(comment_content, user_id, board_id, post_date, update_date)
+        VALUES ('${commentContent}', '${userId}', '${boardId}', DATE_ADD(now(), INTERVAL 9 HOUR), DATE_ADD(now(), INTERVAL 9 HOUR));
     </insert>
 
     <update id="updateComment" parameterType="CommentDTO">
@@ -71,4 +73,17 @@
     <delete id="deleteCommentsByUserId" parameterType="CommentDTO">
         DELETE FROM comments WHERE user_id = '${userId}';
     </delete>
+
+    <select id="isUsable" resultType="boolean">
+        SELECT usable FROM comments WHERE comment_id = '${commentId}';
+    </select>
+    <update id="toUnusableByCommentId" parameterType="CommentDTO">
+        UPDATE comments SET usable = false WHERE comment_id = '${commentId}';
+    </update>
+    <update id="toUnusableByBoardId" parameterType="CommentDTO">
+        UPDATE comments SET usable = false WHERE board_id = '${boardId}';
+    </update>
+    <update id="toUnusableByUserId" parameterType="CommentDTO">
+        UPDATE comments SET usable = false WHERE user_id = '${userId}';
+    </update>
 </mapper>

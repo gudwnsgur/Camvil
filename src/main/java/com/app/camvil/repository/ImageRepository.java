@@ -14,4 +14,8 @@ public interface ImageRepository {
     void insertImages(ImageDTO imageDTO);
     void deleteImagesByBoardId(long boardId);
     List<ImageListDTO> findImageListByBoardId(long boardId);
+
+    boolean isUsable(long imageId);
+    void toUnusableByBoardId(long boardId);
+    void toUnusableByImageId(long imageId);
 }

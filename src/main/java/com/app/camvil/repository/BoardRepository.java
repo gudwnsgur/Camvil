@@ -31,6 +31,7 @@ public interface BoardRepository {
     List<CampsiteCountResponseDTO> getCampsiteCount();
     long getCommentCountByBoardId(long boardId);
     long getTotalBoardCnt(String search, String campsiteCode, String order);
+    long getTotalBoardCntContainsCode(String search, String campsiteCode, String order);
     long getTotalBoardCntWithUserId(long userId);
     long getTotalLikeBoardCntWithUserId(long userId);
     void insertBoard(BoardDTO boardDTO);
@@ -42,4 +43,8 @@ public interface BoardRepository {
     void decreaseCommentsByBoardId(long commentCnt, long boardId);
 
     void deleteBoard(long boardId);
+
+    boolean isUsable(long boardId);
+    void toUnusableByBoardId(long boardId);
+    void toUnusableByUserId(long userId);
 }

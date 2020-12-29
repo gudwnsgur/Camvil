@@ -47,4 +47,9 @@ public class CommentService {
     public void deleteCommentsByUserId(long userId) {
         repository.deleteCommentsByUserId(userId);
     }
+
+    public boolean isUsable(long commentId) {return repository.isUsable(commentId);}
+    public void toUnusableByCommentId(long commentId) {repository.toUnusableByCommentId(commentId);}
+    public void toUnusableByBoardId(long boardId) {repository.toUnusableByBoardId(boardId);}
+    public void toUnusableByUserId(long userId) {repository.toUnusableByUserId(userId);}
 }

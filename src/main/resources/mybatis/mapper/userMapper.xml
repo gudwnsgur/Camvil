@@ -17,17 +17,17 @@
     </resultMap>
 
     <select id="isExternalImage" resultType="boolean">
-        SELECT external_image FROM users WHERE user_id = '${userId}';
+        SELECT external_image FROM users WHERE user_id = '${userId}' AND usable = true;
     </select>
     <select id="getUserList" resultMap="userMap">
-        SELECT * FROM users;
+        SELECT * FROM users WHERE usable = true;
     </select>
 
     <select id="findUserByUserId" resultMap="userMap">
-        SELECT * FROM users WHERE user_id = '${userId}';
+        SELECT * FROM users WHERE user_id = '${userId}' AND usable = true;
     </select>
     <select id="findUserByUserSid" resultMap="userMap">
-        SELECT * FROM users WHERE user_sid = '${userSid}';
+        SELECT * FROM users WHERE user_sid = '${userSid}' AND usable = true;
     </select>
     <select id="getSearch" resultType="com.app.camvil.dto.SearchDTO">
         SELECT search_content as searchContent, search_cnt as searchCnt
@@ -64,4 +64,10 @@
         CALL DeleteUser('${userId}');
     </delete>
 
+    <select id="isUsable" resultType="boolean">
+        SELECT usable FROM users WHERE user_id = '${userId}';
+    </select>
+    <update id="toUnusableByUserId" parameterType="UserDTO">
+        UPDATE users SET usable = false WHERE user_id = '${userId}';
+    </update>
 </mapper>

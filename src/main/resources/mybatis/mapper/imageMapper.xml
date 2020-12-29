@@ -28,4 +28,14 @@
         DELETE FROM images WHERE board_id = '${boardId}';
     </delete>
 
+    <select id="isUsable" resultType="boolean">
+        SELECT usable FROM images WHERE image_id = '${imageId}';
+    </select>
+    <update id="toUnusableByBoardId" parameterType="ImageDTO">
+        UPDATE images SET usable = false WHERE board_id = '${boardId}';
+    </update>
+    <update id="toUnusableByImageId" parameterType="ImageDTO">
+        UPDATE images SET usable = false WHERE image_id = '${imageId}';
+    </update>
+
 </mapper>

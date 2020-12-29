@@ -99,5 +99,9 @@ public class ImageService {
     public void deleteImagesByBoardId(long boardId) {
         repository.deleteImagesByBoardId(boardId);
     }
+
+    public boolean isUsable(long imageId) {return repository.isUsable(imageId);}
+    public void toUnusableByImageId(long imageId){repository.toUnusableByImageId(imageId);}
+    public void toUnusableByBoardId(long boardId){repository.toUnusableByBoardId(boardId);}
 }
 

@@ -23,4 +23,8 @@ public interface UserRepository {
     void updateUserToken(UserDTO user);
     void updateTokenByUserId(long userId, String fcmToken);
     void deleteUser(long userId);
+
+    boolean isUsable(long userId);
+    void toUnusableByUserId(long userId);
+
 }

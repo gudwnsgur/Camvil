@@ -30,19 +30,9 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
-// 댓글 상세 조회
-    /*
-    commentSearchRequestDTO :
-    commentSearchResponseDTO :
-     */
-
     // 댓글 생성
-    /*
-    CommentCreateRequestDTO : userId, boardId, commentContent
-    CommentCreateResponseDTO : NULL
-    */
     @RequestMapping(value = "/comment/create", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
-    public String commentCreate(@RequestBody String request){
+    public String commentCreate(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
 
@@ -50,7 +40,7 @@ public class CommentController {
         CommentCreateRequestDTO commentCreateRequestDTO = gson.fromJson(request, CommentCreateRequestDTO.class);
 
         // if user_id not found || if board_id not found
-        if(userService.findUserByUserId(commentCreateRequestDTO.getUserId()) == null ||
+        if (userService.findUserByUserId(commentCreateRequestDTO.getUserId()) == null ||
                 boardService.findBoardByBoardId(commentCreateRequestDTO.getBoardId()) == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
@@ -81,7 +71,7 @@ public class CommentController {
     CommentCreateResponseDTO : NULL
     */
     @RequestMapping(value = "/comment/update", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
-    public String commentUpdate(@RequestBody String request){
+    public String commentUpdate(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
 
@@ -89,15 +79,22 @@ public class CommentController {
         CommentUpdateRequestDTO commentUpdateRequestDTO = gson.fromJson(request, CommentUpdateRequestDTO.class);
         UserDTO user = userService.findUserByUserId(commentUpdateRequestDTO.getUserId());
 
-        // if user_id not found || if board_id not found || if comment_id not found
-        if(userService.findUserByUserId(commentUpdateRequestDTO.getUserId()) == null ||
+        // if user_id not found || if comment_id not found
+        if (userService.findUserByUserId(commentUpdateRequestDTO.getUserId()) == null ||
                 commentService.findCommentByCommentId(commentUpdateRequestDTO.getCommentId()) == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
+        // if board_id not found
+        if (boardService.findBoardByBoardId(commentService.findCommentByCommentId(
+                commentUpdateRequestDTO.getCommentId()).getBoardId()) == null) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
 
-        if(commentService.findCommentByCommentId(commentUpdateRequestDTO.getCommentId()).getUserId() !=
+        if (commentService.findCommentByCommentId(commentUpdateRequestDTO.getCommentId()).getUserId() !=
                 (user.getUserId())) {
             response.put("responseCode", 401);
             response.put("responseMessage", "Unauthorized");
@@ -121,32 +118,35 @@ public class CommentController {
 
 
     // 댓글 삭제
-    /*
-    CommentCreateRequestDTO : commentId, userId, boardId
-    CommentCreateResponseDTO : NULL
-    */
     @RequestMapping(value = "/comment/delete", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
-    public String commentDelete(@RequestBody String request){
+    public String commentDelete(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
 
         // json to CommentCreateRequestDTO
         CommentDeleteRequestDTO commentDeleteRequestDTO = gson.fromJson(request, CommentDeleteRequestDTO.class);
 
-        // if user_id not found || if comment_id not found || if board_id not found
-        if(userService.findUserByUserId(commentDeleteRequestDTO.getUserId()) == null ||
-                commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()) == null)
-        {
+        // if user_id not found || if comment_id not found
+        if (userService.findUserByUserId(commentDeleteRequestDTO.getUserId()) == null ||
+                commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()) == null) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+        // if board_id not found
+        if (boardService.findBoardByBoardId(commentService.findCommentByCommentId(
+                commentDeleteRequestDTO.getCommentId()).getBoardId()) == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
 
         UserDTO user = userService.findUserByUserId(commentDeleteRequestDTO.getUserId());
-        if(commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()).getUserId() != (user.getUserId())
+
+        if (commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()).getUserId() != (user.getUserId())
                 && boardService.findBoardByBoardId(
-                commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()).getBoardId()
-        ).getUserId() != (user.getUserId())
+                commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()).getBoardId())
+                .getUserId() != (user.getUserId())
                 && !user.isUserAuth()
         ) {
             response.put("responseCode", 401);
@@ -157,7 +157,8 @@ public class CommentController {
         // comment count - 1 in board
         boardService.decreaseComment(commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()).getBoardId());
         // delete comment in comments table
-        commentService.deleteCommentByCommentId(commentDeleteRequestDTO.getCommentId());
+        System.out.println(commentDeleteRequestDTO.getCommentId());
+        commentService.toUnusableByCommentId(commentDeleteRequestDTO.getCommentId());
 
         // response
         response.put("responseCode", 204);
@@ -168,23 +169,18 @@ public class CommentController {
 
 
     // 상세한 댓글 보기
-    /*
-    request : boardId
-    responseBody : commentCnt, List<userName, userImagePath, commentContent, postDate>
-    */
     @RequestMapping(value = "/comment/detail", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
-    public String commentDetail(@RequestBody String request){
+    public String commentDetail(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
 
         // json to DTO
         BoardDTO board = gson.fromJson(request, BoardDTO.class);
-        if(boardService.findBoardByBoardId(board.getBoardId()) == null) {
+        if (boardService.findBoardByBoardId(board.getBoardId()) == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
-
 
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("boardId", board.getBoardId());
