@@ -44,10 +44,10 @@ public class BoardController {
                 boardsRequestDTO.getOrder().equals("") ||
                 boardsRequestDTO.getOrder().equals("post_date")) ? "post_date" : "like_cnt";
         String campsiteCode = boardsRequestDTO.getCampsiteCode() == null ? "" : boardsRequestDTO.getCampsiteCode();
-        String search =  boardsRequestDTO.getSearch() == null ? "" : boardsRequestDTO.getSearch();
+        String search = boardsRequestDTO.getSearch() == null ? "" : boardsRequestDTO.getSearch();
 
-        if(!search.equals("")) {
-            if(userService.findSearchBySearchContent(search) == null) {
+        if (!search.equals("")) {
+            if (userService.findSearchBySearchContent(search) == null) {
                 userService.insertSearchContent(search);
             }
             userService.increaseSearchContent(search);
@@ -57,7 +57,7 @@ public class BoardController {
 
         List<BoardsDTO> boardsDTOS = boardService.getBoards(search, campsiteCode, order,
                 boardsRequestDTO.getPageSize(),
-                boardsRequestDTO.getPageSize()*(boardsRequestDTO.getPageNumber()-1));
+                boardsRequestDTO.getPageSize() * (boardsRequestDTO.getPageNumber() - 1));
 
 
         List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
@@ -93,7 +93,7 @@ public class BoardController {
         BoardCreateRequestDTO boardCreateRequestDTO = gson.fromJson(request, BoardCreateRequestDTO.class);
 
         // if user id not found
-        if(userService.findUserByUserId(boardCreateRequestDTO.getUserId()) == null) {
+        if (userService.findUserByUserId(boardCreateRequestDTO.getUserId()) == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -109,7 +109,7 @@ public class BoardController {
 
 
         ArrayList<String> imageNames = new ArrayList<>();
-        if( boardCreateRequestDTO.getImages() != null
+        if (boardCreateRequestDTO.getImages() != null
                 && !boardCreateRequestDTO.getImages().isEmpty()) {
             // decoding images
             for (int i = 0; i < boardCreateRequestDTO.getImages().size(); i++) {
@@ -126,7 +126,7 @@ public class BoardController {
         long curBoardId = boardService.findLastBoardId().getBoardId();
         UserDTO user = userService.findUserByUserId(boardCreateRequestDTO.getUserId());
 
-        if(imageNames != null && !imageNames.isEmpty()) {
+        if (imageNames != null && !imageNames.isEmpty()) {
             // insert images in images table
             for (String imageName : imageNames) {
                 ImageDTO image = new ImageDTO(curBoardId, imageName, "/images");
@@ -157,7 +157,7 @@ public class BoardController {
 
     // 게시물 수정
     @RequestMapping(value = "/board/update", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
-    public String boardUpdate(@RequestBody String request){
+    public String boardUpdate(@RequestBody String request) {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
 
@@ -167,13 +167,13 @@ public class BoardController {
         UserDTO user = userService.findUserByUserId(boardUpdateRequestDTO.getUserId());
 
         // userId, boardId 없으면 400 bad request
-        if(board == null || user == null) {
+        if (board == null || user == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
         // userId 다르면 401 unauthorized
-        if(board.getUserId() != (user.getUserId())) {
+        if (board.getUserId() != (user.getUserId())) {
             response.put("responseCode", 401);
             response.put("responseMessage", "Unauthorized");
             return gson.toJson(response);
@@ -224,14 +224,14 @@ public class BoardController {
         UserDTO user = userService.findUserByUserId(boardDeleteRequestDTO.getUserId());
 
         // userId 없거나 boardId 없으면 400 bad request
-        if(user == null || board == null) {
+        if (user == null || board == null) {
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
 
         // userId 다르고 auth = 0 이면 401 unauthorized
-        if(board.getUserId() != (user.getUserId()) && !user.isUserAuth()) {
+        if (board.getUserId() != (user.getUserId()) && !user.isUserAuth()) {
             response.put("responseCode", 401);
             response.put("responseMessage", "Unauthorized");
             return gson.toJson(response);
@@ -268,9 +268,37 @@ public class BoardController {
             }
         }
 
-        response.put("responseCode", 200);
+        response.put("responseCode", 200);  
         response.put("responseMessage", "OK");
         response.put("responseBody", campsiteCountResponseDTOS1);
+        return gson.toJson(response);
+    }
+
+    // board detail
+    @RequestMapping(value = "/board/detail", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
+    public String boardDetail(@RequestBody String request) {
+        Gson gson = new GsonBuilder().create();
+        Map<String, Object> response = new HashMap<>();
+
+        BoardDTO board = gson.fromJson(request, BoardDTO.class);
+        board = boardService.findBoardByBoardId(board.getBoardId());
+
+        if (board == null) {
+            response.put("responseCode", 400);
+            response.put("responseMessage", "Bad Request");
+            return gson.toJson(response);
+        }
+        long boardId = board.getBoardId();
+        System.out.println(boardId);
+        BoardsDTO boardsDTO = boardService.getBoard(boardId);
+        List<ImageListDTO> images = imageService.findImageListByBoardId(boardId);
+        List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(boardId);
+
+        BoardsResponseDTO boardsResponseDTO = new BoardsResponseDTO(boardsDTO, images, comments);
+
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", boardsResponseDTO);
         return gson.toJson(response);
     }
 

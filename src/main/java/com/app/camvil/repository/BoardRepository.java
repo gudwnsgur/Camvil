@@ -21,6 +21,7 @@ public interface BoardRepository {
     List<BoardsDTO> getLikeBoardsByUserId(long userId);
     List<BoardsDTO> getLikeBoardsByUserIdWithPaging(long userId, int limit, int offset);
 
+    BoardsDTO getBoard(long boardId);
     BoardDTO findLastBoardId();
     BoardDTO findBoardByBoardId(long boardId);
     List<BoardDTO> findBoardsByUserId(long userId);

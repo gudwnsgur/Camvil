@@ -21,6 +21,10 @@ public class BoardService {
         else
             return repository.getBoardsContainsCode(search, campsiteCode, order, limit, offset);
     }
+    public BoardsDTO getBoard(long boardId) {
+        return repository.getBoard(boardId);
+    }
+
 
     public List<BoardsDTO> getBoardsByUserId(long userId) {
         return repository.getBoardsByUserId(userId);
