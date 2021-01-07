@@ -18,15 +18,15 @@
     </select>
 
     <insert id="insertLike" parameterType="LikeDTO">
-        INSERT INTO likes VALUES('${userId}', '${boardId}', false, DATE_ADD(now(), INTERVAL 9 HOUR);
+        INSERT INTO likes VALUES('${userId}', '${boardId}', false, DATE_ADD(now(), INTERVAL 9 HOUR));
     </insert>
 
     <update id="updateUnlikeToLike" parameterType="LikeDTO">
-        UPDATE likes SET like_ = true, post_date = DATE_ADD(now(), INTERVAL 9 HOUR
+        UPDATE likes SET like_ = true, post_date = DATE_ADD(now(), INTERVAL 9 HOUR)
         WHERE user_id = '${userId}' AND board_id = '${boardId}';
     </update>
     <update id="updateLikeToUnlike" parameterType="LikeDTO">
-        UPDATE likes SET like_ = false, post_date = DATE_ADD(now(), INTERVAL 9 HOUR
+        UPDATE likes SET like_ = false, post_date = DATE_ADD(now(), INTERVAL 9 HOUR)
         WHERE user_id = '${userId}' AND board_id = '${boardId}';
     </update>
 

@@ -55,6 +55,9 @@ public class LikeController {
             boardService.increaseLike(like.getBoardId());
             likeService.updateUnlikeToLike(like);
         }
+        likeRequestDTO = null;
+        like = null;
+
         response.put("responseCode", 204);
         response.put("responseMessage", "No Content");
         return gson.toJson(response);

@@ -39,6 +39,7 @@ public class CommentController {
         // json to CommentCreateRequestDTO
         CommentCreateRequestDTO commentCreateRequestDTO = gson.fromJson(request, CommentCreateRequestDTO.class);
 
+
         // if user_id not found || if board_id not found
         if (userService.findUserByUserId(commentCreateRequestDTO.getUserId()) == null ||
                 boardService.findBoardByBoardId(commentCreateRequestDTO.getBoardId()) == null) {
@@ -55,13 +56,16 @@ public class CommentController {
 
         // comment count + 1 in board
         boardService.increaseComment(commentCreateRequestDTO.getBoardId());
-
         CommentDTO comment = commentService.findLastCommentId();
 
+
+        commentDTO = null;
+        commentCreateRequestDTO = null;
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", comment);
+        comment = null;
         return gson.toJson(response);
     }
 
@@ -109,10 +113,15 @@ public class CommentController {
 
 
         commentDTO = commentService.findCommentByCommentId(commentUpdateRequestDTO.getCommentId());
+
+        commentUpdateRequestDTO = null;
+        user = null;
+
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", commentDTO);
+        commentDTO = null;
         return gson.toJson(response);
     }
 
@@ -157,8 +166,11 @@ public class CommentController {
         // comment count - 1 in board
         boardService.decreaseComment(commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()).getBoardId());
         // delete comment in comments table
-        System.out.println(commentDeleteRequestDTO.getCommentId());
         commentService.toUnusableByCommentId(commentDeleteRequestDTO.getCommentId());
+
+
+        commentDeleteRequestDTO = null;
+        user = null;
 
         // response
         response.put("responseCode", 204);
@@ -190,10 +202,16 @@ public class CommentController {
                 commentService.getCommentsByBoardId(board.getBoardId());
         responseBody.put("items", commentDetailResponseDTOS);
 
+
+        board = null;
+
+
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", responseBody);
+
+        responseBody = null;
         return gson.toJson(response);
     }
 }

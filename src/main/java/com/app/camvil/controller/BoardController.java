@@ -54,10 +54,12 @@ public class BoardController {
         }
 
         long total = boardService.getTotalBoardCnt(search, campsiteCode, order);
-
         List<BoardsDTO> boardsDTOS = boardService.getBoards(search, campsiteCode, order,
                 boardsRequestDTO.getPageSize(),
                 boardsRequestDTO.getPageSize() * (boardsRequestDTO.getPageNumber() - 1));
+        order = null;
+        campsiteCode = null;
+        search = null;
 
 
         List<BoardsResponseDTO> boardsResponseDTO = new ArrayList<>();
@@ -69,17 +71,24 @@ public class BoardController {
 
             BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
+            curBoard = null;
         }
+        boardsDTOS = null;
 
         responseBody.put("items", boardsResponseDTO);
         responseBody.put("pageNumber", boardsRequestDTO.getPageNumber());
         responseBody.put("pageSize", boardsRequestDTO.getPageSize());
         responseBody.put("total", total);
 
+        boardsResponseDTO = null;
+        boardsRequestDTO = null;
+
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", responseBody);
+        responseBody = null;
+
         return gson.toJson(response);
     }
 
@@ -98,7 +107,6 @@ public class BoardController {
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
-
         // if campsite not existed => insert campsite in campsites table
         if (campsiteService.findCampsiteNameByCode(boardCreateRequestDTO.getCampsiteCode()) == null) {
             CampsiteDTO campsite = new CampsiteDTO(boardCreateRequestDTO.getCampsiteCode(),
@@ -122,17 +130,19 @@ public class BoardController {
                 boardCreateRequestDTO.getBoardContent()
         );
         boardService.insertBoard(board);
+        board = null;
 
         long curBoardId = boardService.findLastBoardId().getBoardId();
         UserDTO user = userService.findUserByUserId(boardCreateRequestDTO.getUserId());
 
-        if (imageNames != null && !imageNames.isEmpty()) {
+        if (!imageNames.isEmpty()) {
             // insert images in images table
             for (String imageName : imageNames) {
                 ImageDTO image = new ImageDTO(curBoardId, imageName, "/images");
                 imageService.insertImages(image);
             }
         }
+        imageNames = null;
         List<ImageListDTO> responseImageList = imageService.findImageListByBoardId(curBoardId);
 
         // make response body
@@ -148,10 +158,15 @@ public class BoardController {
                 boardService.findBoardByBoardId(curBoardId).getUpdateDate()
         );
 
+        boardCreateRequestDTO = null;
+        user = null;
+        responseImageList = null;
+
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", boardCreateResponseDTO);
+        boardCreateResponseDTO = null;
         return gson.toJson(response);
     }
 
@@ -185,6 +200,7 @@ public class BoardController {
                     boardUpdateRequestDTO.getCampsiteName(),
                     boardUpdateRequestDTO.getMapX(), boardUpdateRequestDTO.getMapY());
             campsiteService.insertCampsite(campsite);
+            campsite = null;
         }
 
         // update board
@@ -207,9 +223,15 @@ public class BoardController {
                 board.getUpdateDate()
         );
         // response
+        board = null;
+        user = null;
+        responseImageList = null;
+        boardUpdateRequestDTO = null;
+
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", boardCreateResponseDTO);
+        boardCreateResponseDTO = null;
         return gson.toJson(response);
     }
 
@@ -246,6 +268,12 @@ public class BoardController {
         commentService.toUnusableByBoardId(boardDeleteRequestDTO.getBoardId());
         boardService.toUnusableByBoardId(boardDeleteRequestDTO.getBoardId());
 
+
+        boardDeleteRequestDTO = null;
+        images = null;
+        board = null;
+        user = null;
+
         response.put("responseCode", 204);
         response.put("responseMessage", "No Content");
         response.put("responseBody", null);
@@ -268,9 +296,12 @@ public class BoardController {
             }
         }
 
+        campsiteCountResponseDTOS = null;
+
         response.put("responseCode", 200);  
         response.put("responseMessage", "OK");
         response.put("responseBody", campsiteCountResponseDTOS1);
+        campsiteCountResponseDTOS1 = null;
         return gson.toJson(response);
     }
 
@@ -289,16 +320,21 @@ public class BoardController {
             return gson.toJson(response);
         }
         long boardId = board.getBoardId();
-        System.out.println(boardId);
         BoardsDTO boardsDTO = boardService.getBoard(boardId);
         List<ImageListDTO> images = imageService.findImageListByBoardId(boardId);
         List<CommentDetailResponseDTO> comments = commentService.getTwoCommentsByBoardId(boardId);
 
         BoardsResponseDTO boardsResponseDTO = new BoardsResponseDTO(boardsDTO, images, comments);
 
+        board = null;
+        boardsDTO = null;
+        images = null;
+        comments = null;
+
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", boardsResponseDTO);
+        boardsResponseDTO = null;
         return gson.toJson(response);
     }
 

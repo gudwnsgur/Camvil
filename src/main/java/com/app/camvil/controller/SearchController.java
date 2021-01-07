@@ -27,6 +27,7 @@ public class SearchController {
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", searchDTOList);
+        searchDTOList = null;
         return gson.toJson(response);
     }
 }
