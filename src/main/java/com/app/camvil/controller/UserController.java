@@ -40,6 +40,7 @@ public class UserController {
         if (signUpRequestDTO.getUserSid() == null || signUpRequestDTO.getUserSid().equals("") ||
                 signUpRequestDTO.getUserName() == null || signUpRequestDTO.getUserName().equals("") ||
                 signUpRequestDTO.getFcmToken() == null || signUpRequestDTO.getFcmToken().equals("")) {
+            signUpRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -49,6 +50,8 @@ public class UserController {
                 signUpRequestDTO.getUserName(), signUpRequestDTO.getFcmToken());
 
         if (userService.findUserByUserSid(user.getUserSid()) != null) {
+            user = null;
+            signUpRequestDTO = null;
             response.put("responseCode", 409);
             response.put("responseMessage", "Conflict : already existed user");
             return gson.toJson(response);
@@ -86,12 +89,14 @@ public class UserController {
         LoginRequestDTO loginRequestDTO = gson.fromJson(request, LoginRequestDTO.class);
         if (loginRequestDTO.getUserSid() == null || loginRequestDTO.getUserSid().equals("") ||
                 loginRequestDTO.getFcmToken() == null || loginRequestDTO.getFcmToken().equals("")) {
+            loginRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
         UserDTO user = userService.findUserByUserSid(loginRequestDTO.getUserSid());
         if (user == null) {
+            loginRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -104,6 +109,7 @@ public class UserController {
 
         loginRequestDTO = null;
         user = null;
+        userAuth = null;
 
         // response
         response.put("responseCode", 200);
@@ -124,6 +130,7 @@ public class UserController {
         UserDTO user = userService.findUserByUserId(myPageRequestDTO.getUserId());
 
         if (user == null) {
+            myPageRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -153,6 +160,9 @@ public class UserController {
         UserDTO user = userService.findUserByUserId(userUpdateRequestDTO.getUserId());
 
         if (userService.findUserByUserId(userUpdateRequestDTO.getUserId()) == null) {
+            user = null;
+            userUpdateRequestDTO = null;
+
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -177,7 +187,6 @@ public class UserController {
         user.setExternalImage(isExternalImage);
 
         userService.updateUser(user);
-
 
         MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO(user);
 
@@ -220,33 +229,37 @@ public class UserController {
             List<ImageDTO> images = imageService.findImagesByBoardId(boardId);
             for (ImageDTO image : images) {
                 imageService.toUnusableByImageId(image.getImageId());
+                image = null;
             }
             commentService.toUnusableByBoardId(boardId);
             boardService.toUnusableByBoardId(boardId);
+            board = null;
+            images = null;
         }
+        boards = null;
+        userDeleteRequestDTO = null;
 
         // decrease likes
         List<LikeDTO> likes = likeService.findLikeBoardsByUserId(user.getUserId());
         for (LikeDTO like : likes) {
             if (boardService.findBoardByBoardId(like.getBoardId()) != null)
                 boardService.decreaseLike(like.getBoardId());
+            like = null;
         }
+        likes = null;
+
         // decrease comments
         List<CommentCountDTO> comments = commentService.countCommentsByUserId(user.getUserId());
         for (CommentCountDTO comment : comments) {
             if (boardService.findBoardByBoardId(comment.getBoardId()) != null)
                 boardService.decreaseCommentsByBoardId(comment.getCommentCnt(), comment.getBoardId());
-
+            comment = null;
         }
+        comments = null;
+        user = null;
 
         // delete user
         userService.toUnusableByUserId(userId);
-
-        userDeleteRequestDTO = null;
-        user = null;
-        boards = null;
-        comments = null;
-        likes = null;
 
         // response
         response.put("responseCode", 204);
@@ -262,6 +275,7 @@ public class UserController {
 
         FcmTokenDTO fcmTokenDTO = gson.fromJson(request, FcmTokenDTO.class);
         if (userService.findUserByUserId(fcmTokenDTO.getUserId()) == null) {
+            fcmTokenDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -287,6 +301,7 @@ public class UserController {
 
         // if user id not found
         if (userService.findUserByUserId(userIdRequestDTO.getUserId()) == null) {
+            userIdRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -304,20 +319,24 @@ public class UserController {
 
             BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
+            images = null;
+            comments = null;
+            curBoard = null;
+            boardsDTO = null;
         }
 
         responseBody.put("items", boardsResponseDTO);
         responseBody.put("total", total);
 
-        // response
-        response.put("responseCode", 200);
-        response.put("responseMessage", "OK");
-        response.put("responseBody", responseBody);
-
         userIdRequestDTO = null;
         user = null;
         boardsDTOS = null;
         boardsResponseDTO =null;
+
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", responseBody);
         responseBody = null;
 
         return gson.toJson(response);
@@ -334,6 +353,7 @@ public class UserController {
 
         // if user id not found
         if (userService.findUserByUserId(userIdRequestDTO.getUserId()) == null) {
+            userIdRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -351,20 +371,25 @@ public class UserController {
 
             BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
+
+            images = null;
+            comments = null;
+            curBoard = null;
+            boardsDTO = null;
         }
 
         responseBody.put("items", boardsResponseDTO);
         responseBody.put("total", total);
 
-        // response
-        response.put("responseCode", 200);
-        response.put("responseMessage", "OK");
-        response.put("responseBody", responseBody);
-
         userIdRequestDTO = null;
         user = null;
         boardsDTOS = null;
         boardsResponseDTO =null;
+
+        // response
+        response.put("responseCode", 200);
+        response.put("responseMessage", "OK");
+        response.put("responseBody", responseBody);
         responseBody = null;
         return gson.toJson(response);
     }
@@ -380,6 +405,9 @@ public class UserController {
 
         // if user id not found
         if (userService.findUserByUserId(userPagingDTO.getUserId()) == null) {
+            userPagingDTO = null;
+            responseBody = null;
+
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -400,6 +428,11 @@ public class UserController {
 
             BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
+
+            images = null;
+            comments = null;
+            curBoard = null;
+            boardsDTO = null;
         }
 
         responseBody.put("items", boardsResponseDTO);
@@ -407,15 +440,16 @@ public class UserController {
         responseBody.put("pageSize", userPagingDTO.getPageSize());
         responseBody.put("total", total);
 
+        userPagingDTO = null;
+        user = null;
+        boardsDTOS = null;
+        boardsResponseDTO =null;
+
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", responseBody);
 
-        userPagingDTO = null;
-        user = null;
-        boardsDTOS = null;
-        boardsResponseDTO =null;
         responseBody = null;
         return gson.toJson(response);
     }
@@ -430,6 +464,7 @@ public class UserController {
 
         // if user id not found
         if (userService.findUserByUserId(userPagingDTO.getUserId()) == null) {
+            userPagingDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -450,6 +485,11 @@ public class UserController {
 
             BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
+
+            images = null;
+            comments = null;
+            curBoard = null;
+            boardsDTO = null;
         }
 
         responseBody.put("items", boardsResponseDTO);
@@ -457,15 +497,15 @@ public class UserController {
         responseBody.put("pageSize", userPagingDTO.getPageSize());
         responseBody.put("total", total);
 
+        userPagingDTO = null;
+        user = null;
+        boardsDTOS = null;
+        boardsResponseDTO =null;
         // response
         response.put("responseCode", 200);
         response.put("responseMessage", "OK");
         response.put("responseBody", responseBody);
 
-        userPagingDTO = null;
-        user = null;
-        boardsDTOS = null;
-        boardsResponseDTO =null;
         responseBody = null;
         return gson.toJson(response);
     }

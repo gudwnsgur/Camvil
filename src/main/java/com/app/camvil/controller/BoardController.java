@@ -72,6 +72,9 @@ public class BoardController {
             BoardsResponseDTO curBoard = new BoardsResponseDTO(boardsDTO, images, comments);
             boardsResponseDTO.add(curBoard);
             curBoard = null;
+            boardsDTO = null;
+            images = null;
+            comments = null;
         }
         boardsDTOS = null;
 
@@ -103,6 +106,7 @@ public class BoardController {
 
         // if user id not found
         if (userService.findUserByUserId(boardCreateRequestDTO.getUserId()) == null) {
+            boardCreateRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -113,8 +117,8 @@ public class BoardController {
                     boardCreateRequestDTO.getCampsiteName(),
                     boardCreateRequestDTO.getMapX(), boardCreateRequestDTO.getMapY());
             campsiteService.insertCampsite(campsite);
+            campsite = null;
         }
-
 
         ArrayList<String> imageNames = new ArrayList<>();
         if (boardCreateRequestDTO.getImages() != null
@@ -140,6 +144,8 @@ public class BoardController {
             for (String imageName : imageNames) {
                 ImageDTO image = new ImageDTO(curBoardId, imageName, "/images");
                 imageService.insertImages(image);
+                image = null;
+                imageName = null;
             }
         }
         imageNames = null;
@@ -183,12 +189,16 @@ public class BoardController {
 
         // userId, boardId 없으면 400 bad request
         if (board == null || user == null) {
+            boardUpdateRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
         }
         // userId 다르면 401 unauthorized
         if (board.getUserId() != (user.getUserId())) {
+            board = null;
+            user = null;
+            boardUpdateRequestDTO = null;
             response.put("responseCode", 401);
             response.put("responseMessage", "Unauthorized");
             return gson.toJson(response);
@@ -247,6 +257,7 @@ public class BoardController {
 
         // userId 없거나 boardId 없으면 400 bad request
         if (user == null || board == null) {
+            boardDeleteRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -254,6 +265,10 @@ public class BoardController {
 
         // userId 다르고 auth = 0 이면 401 unauthorized
         if (board.getUserId() != (user.getUserId()) && !user.isUserAuth()) {
+            board = null;
+            user = null;
+            boardDeleteRequestDTO = null;
+
             response.put("responseCode", 401);
             response.put("responseMessage", "Unauthorized");
             return gson.toJson(response);
@@ -263,6 +278,7 @@ public class BoardController {
         List<ImageDTO> images = imageService.findImagesByBoardId(boardDeleteRequestDTO.getBoardId());
         for (ImageDTO image : images) {
             imageService.toUnusableByImageId(image.getImageId());
+            image = null;
         }
 
         commentService.toUnusableByBoardId(boardDeleteRequestDTO.getBoardId());
@@ -294,6 +310,7 @@ public class BoardController {
             if (!campsiteCountResponseDTO.getCampsiteCode().equals("")) {
                 campsiteCountResponseDTOS1.add(campsiteCountResponseDTO);
             }
+            campsiteCountResponseDTO = null;
         }
 
         campsiteCountResponseDTOS = null;

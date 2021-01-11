@@ -35,6 +35,7 @@ public class LikeController {
         // if user_id not found || if board_id not found
         if(userService.findUserByUserId(likeRequestDTO.getUserId()) == null ||
                 boardService.findBoardByBoardId(likeRequestDTO.getBoardId()) == null) {
+            likeRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);

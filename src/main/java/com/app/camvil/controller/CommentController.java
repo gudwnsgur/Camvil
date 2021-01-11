@@ -43,6 +43,7 @@ public class CommentController {
         // if user_id not found || if board_id not found
         if (userService.findUserByUserId(commentCreateRequestDTO.getUserId()) == null ||
                 boardService.findBoardByBoardId(commentCreateRequestDTO.getBoardId()) == null) {
+            commentCreateRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -86,6 +87,8 @@ public class CommentController {
         // if user_id not found || if comment_id not found
         if (userService.findUserByUserId(commentUpdateRequestDTO.getUserId()) == null ||
                 commentService.findCommentByCommentId(commentUpdateRequestDTO.getCommentId()) == null) {
+            user = null;
+            commentUpdateRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -93,6 +96,8 @@ public class CommentController {
         // if board_id not found
         if (boardService.findBoardByBoardId(commentService.findCommentByCommentId(
                 commentUpdateRequestDTO.getCommentId()).getBoardId()) == null) {
+            user = null;
+            commentUpdateRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -100,6 +105,9 @@ public class CommentController {
 
         if (commentService.findCommentByCommentId(commentUpdateRequestDTO.getCommentId()).getUserId() !=
                 (user.getUserId())) {
+            user = null;
+            commentUpdateRequestDTO = null;
+
             response.put("responseCode", 401);
             response.put("responseMessage", "Unauthorized");
             return gson.toJson(response);
@@ -138,6 +146,7 @@ public class CommentController {
         // if user_id not found || if comment_id not found
         if (userService.findUserByUserId(commentDeleteRequestDTO.getUserId()) == null ||
                 commentService.findCommentByCommentId(commentDeleteRequestDTO.getCommentId()) == null) {
+            commentDeleteRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -145,6 +154,7 @@ public class CommentController {
         // if board_id not found
         if (boardService.findBoardByBoardId(commentService.findCommentByCommentId(
                 commentDeleteRequestDTO.getCommentId()).getBoardId()) == null) {
+            commentDeleteRequestDTO = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -158,6 +168,8 @@ public class CommentController {
                 .getUserId() != (user.getUserId())
                 && !user.isUserAuth()
         ) {
+            user = null;
+            commentDeleteRequestDTO = null;
             response.put("responseCode", 401);
             response.put("responseMessage", "Unauthorized");
             return gson.toJson(response);
@@ -189,6 +201,7 @@ public class CommentController {
         // json to DTO
         BoardDTO board = gson.fromJson(request, BoardDTO.class);
         if (boardService.findBoardByBoardId(board.getBoardId()) == null) {
+            board = null;
             response.put("responseCode", 400);
             response.put("responseMessage", "Bad Request");
             return gson.toJson(response);
@@ -203,8 +216,8 @@ public class CommentController {
         responseBody.put("items", commentDetailResponseDTOS);
 
 
+        commentDetailResponseDTOS = null;
         board = null;
-
 
         // response
         response.put("responseCode", 200);
