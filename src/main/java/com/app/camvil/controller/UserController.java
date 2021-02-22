@@ -150,7 +150,7 @@ public class UserController {
 
     // Update user
     @RequestMapping(value = "/user/update", produces = "application/json;charset=utf-8", method = RequestMethod.POST)
-    public String userUpdate(@RequestBody String request) {
+    public String userUpdate(@RequestBody String request) throws IOException {
         Gson gson = new GsonBuilder().create();
         Map<String, Object> response = new HashMap<>();
         String imagePath = "/images/users";

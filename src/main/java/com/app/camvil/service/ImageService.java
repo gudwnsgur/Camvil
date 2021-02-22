@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -18,32 +20,34 @@ public class ImageService {
     @Autowired
     private ImageRepository repository;
 
-    public String getImageNames(String encodedString) {
+    public String getImageNames(String encodedString) throws IOException {
         String outputFileName = UUID.randomUUID().toString() + ".jpg";
         byte[] decode = Base64.decodeBase64(encodedString);
-        FileOutputStream fos;
+        FileOutputStream fos = null; //null로 초기화
         try {
             File target = new File(BASE_PATH + "/" + outputFileName);
             fos = new FileOutputStream(target);
             fos.write(decode);
-            fos.close();
         }catch(Exception e) {
             e.printStackTrace();
+        } finally {
+            if(fos != null) fos.close();
         }
         return outputFileName;
     }
 
-    public String getUserImageName(String encodedString) {
+    public String getUserImageName(String encodedString) throws IOException {
         String outputFileName = UUID.randomUUID().toString() + ".jpg";
         byte[] decode = Base64.decodeBase64(encodedString);
-        FileOutputStream fos;
+        FileOutputStream fos = null; //null로 초기화
         try {
             File target = new File(BASE_PATH + "/users/" + outputFileName);
             fos = new FileOutputStream(target);
             fos.write(decode);
-            fos.close();
         }catch(Exception e) {
             e.printStackTrace();
+        } finally {
+            if(fos != null) fos.close();
         }
         return outputFileName;
     }
